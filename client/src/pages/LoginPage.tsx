@@ -5,6 +5,8 @@ import Footer from '@/components/Footer';
 import { Button } from "@/components/ui/button";
 import { LogIn, Mail, Lock } from 'lucide-react';
 import axios from 'axios';
+import BASE_URL from "../utils/baseURL"; // Adjust path as needed
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -14,7 +16,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/login', { email, password });
+      const res = await axios.post(`${BASE_URL}/login`, { email, password });
       alert('Login successful');
       // Optional: Store token
       localStorage.setItem('token', res.data.token);
