@@ -14,6 +14,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const allowedOrigins = [
+  'https://travelforall.vercel.app'
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
+
 app.get("/",(req,res)=>{
   res.send("Backend is running");
 })
