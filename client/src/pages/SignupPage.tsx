@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import { Button } from "@/components/ui/button";
 import { UserPlus, User, Mail, Lock } from 'lucide-react';
 import axios from 'axios';
+import BASE_URL from "../utils/baseURL"; 
 
 const SignupPage = () => {
   const Navigate = useNavigate();
@@ -27,7 +28,7 @@ const SignupPage = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post('http://localhost:5000/api/signup', formData);
+      const res = await axios.post(`${BASE_URL}/signup`, formData);
       console.log('Signup success:', res.data);
       Navigate("/login");
       // Optional: Redirect to login or show success toast here
