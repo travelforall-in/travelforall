@@ -23,15 +23,19 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/user/:id" element={<Index />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/packages" element={<PackagesPage />} />
           <Route path="/package/:id" element={<PackageDetailsPage />} />
           <Route path="/destinations" element={<AllDestinations />} />
           <Route path="/explore-packages" element={<ExplorePackages />} />
+          {/* <Route path="/user/:id" element={<UserDashboard />} /> */}
+
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
+
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

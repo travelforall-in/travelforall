@@ -1,5 +1,3 @@
-// server.js
-
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -23,7 +21,6 @@ app.use(cors({
   credentials: true
 }));
 
-
 app.get("/",(req,res)=>{
   res.send("Backend is running");
 })
@@ -35,4 +32,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT,'0.0.0.0', () => {
   console.log(`🚀 Server running at ${PORT}`);
 });
- 
