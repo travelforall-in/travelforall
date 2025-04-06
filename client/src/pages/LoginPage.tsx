@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { Button } from "@/components/ui/button";
 import { LogIn, Mail, Lock } from 'lucide-react';
 import axios from 'axios';
-import BASE_URL from "../utils/baseURL"; // Adjust path as needed
+import BASE_URL from "../utils/baseUrl"; // Adjust path as needed
 
 
 const LoginPage = () => {

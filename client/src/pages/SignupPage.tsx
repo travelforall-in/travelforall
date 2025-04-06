@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { Button } from "@/components/ui/button";
 import { UserPlus, User, Mail, Lock } from 'lucide-react';
 import axios from 'axios';
-import BASE_URL from "../utils/baseURL"; 
+import BASE_URL from "../utils/baseUrl"; 
 
 const SignupPage = () => {
   const Navigate = useNavigate();
