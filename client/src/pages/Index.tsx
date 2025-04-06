@@ -7,9 +7,10 @@ import FeaturedDestinations from '@/components/FeaturedDestinations';
 import PopularPackages from '@/components/PopularPackages';
 import Testimonials from '@/components/Testimonials';
 import NewsletterSection from '@/components/NewsletterSection';
-import AllDestinations from '@/components/AllDestinations';
+import { useParams } from 'react-router-dom';
 
 const Index = () => {
+  const { id } = useParams();
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />

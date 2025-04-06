@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { LogIn, Mail, Lock } from 'lucide-react';
 import axios from 'axios';
 import BASE_URL from "../utils/baseUrl"; // Adjust path as needed
+// import { toast } from 'sonner';
+import toast from 'react-hot-toast';
+
 
 
 const LoginPage = () => {
@@ -17,11 +20,15 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const res = await axios.post(`${BASE_URL}/login`, { email, password });
-      alert('Login successful');
+      const user = res.data.user;
+    const userId = user._id || user.id; 
+
+       alert('Login successful');
       // Optional: Store token
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
-      navigate('/'); // Redirect to home or dashboard
+
+      navigate(`/user/${userId}`); // Redirect to home or dashboard
     } catch (error) {
       alert(error.response?.data?.message || 'Login failed');
     }

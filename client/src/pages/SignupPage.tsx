@@ -30,6 +30,7 @@ const SignupPage = () => {
     try {
       const res = await axios.post(`${BASE_URL}/signup`, formData);
       console.log('Signup success:', res.data);
+      alert('Signup successful');
       Navigate("/login");
       // Optional: Redirect to login or show success toast here
     } catch (err) {
