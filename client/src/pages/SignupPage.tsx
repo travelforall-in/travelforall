@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { UserPlus, User, Mail, Lock } from 'lucide-react';
 import axios from 'axios';
 import BASE_URL from "../utils/baseUrl"; 
+import { toast } from 'sonner';
 
 const SignupPage = () => {
   const Navigate = useNavigate();
@@ -30,6 +31,10 @@ const SignupPage = () => {
     try {
       const res = await axios.post(`${BASE_URL}/signup`, formData);
       console.log('Signup success:', res.data);
+      // toast({
+      //   title: "Logout successful",
+      //   description: "You have been logged out.",
+      // });
       alert('Signup successful');
       Navigate("/login");
       // Optional: Redirect to login or show success toast here

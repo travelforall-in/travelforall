@@ -1,6 +1,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getHomePath } from '@/utils/getHomePath';
 
 const destinations = [
   {
@@ -83,93 +84,101 @@ const destinations = [
     reviews: 412,
     price: 1449,
   },
-  {
-    id: 11,
-    name: 'Dubai, UAE',
-    image: 'https://images.unsplash.com/photo-1602929136313-0793f48dbee8?auto=format&fit=crop&w=1950&q=80',
-    rating: 4.6,
-    reviews: 489,
-    price: 1999,
-  },
-  {
-    id: 12,
-    name: 'Reykjavík, Iceland',
-    image: 'https://images.unsplash.com/photo-1586796878190-3158dcf8322e?auto=format&fit=crop&w=1950&q=80',
-    rating: 4.9,
-    reviews: 344,
-    price: 1899,
-  },
-  {
-    id: 13,
-    name: 'New York City, USA',
-    image: 'https://images.unsplash.com/photo-1533106418989-88406c7cfd1b?auto=format&fit=crop&w=1950&q=80',
-    rating: 4.7,
-    reviews: 850,
-    price: 1599,
-  },
-  {
-    id: 14,
-    name: 'Sydney, Australia',
-    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d7?auto=format&fit=crop&w=1950&q=80',
-    rating: 4.8,
-    reviews: 478,
-    price: 1890,
-  },
-  {
-    id: 15,
-    name: 'Petra, Jordan',
-    image: 'https://images.unsplash.com/photo-1581118480243-e2fb01c5d4a0?auto=format&fit=crop&w=1950&q=80',
-    rating: 4.9,
-    reviews: 256,
-    price: 1620,
-  },
-  {
-    id: 16,
-    name: 'Zermatt, Switzerland',
-    image: 'https://images.unsplash.com/photo-1583142305729-76c2dbafc97f?auto=format&fit=crop&w=1950&q=80',
-    rating: 4.8,
-    reviews: 390,
-    price: 2100,
-  },
-  {
-    id: 17,
-    name: 'Hanoi, Vietnam',
-    image: 'https://images.unsplash.com/photo-1553524789-7241bb691973?auto=format&fit=crop&w=1950&q=80',
-    rating: 4.6,
-    reviews: 284,
-    price: 1320,
-  },
-  {
-    id: 18,
-    name: 'Cape Town, South Africa',
-    image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1950&q=80',
-    rating: 4.7,
-    reviews: 388,
-    price: 1495,
-  },
-  {
-    id: 19,
-    name: 'Amsterdam, Netherlands',
-    image: 'https://images.unsplash.com/photo-1503152394-98b6f43f08dd?auto=format&fit=crop&w=1950&q=80',
-    rating: 4.8,
-    reviews: 410,
-    price: 1380,
-  },
-  {
-    id: 20,
-    name: 'Prague, Czech Republic',
-    image: 'https://images.unsplash.com/photo-1526655009434-6b4e04f9d160?auto=format&fit=crop&w=1950&q=80',
-    rating: 4.9,
-    reviews: 390,
-    price: 1400,
-  },
+  // {
+  //   id: 11,
+  //   name: 'Dubai, UAE',
+  //   image: 'https://images.unsplash.com/photo-1602929136313-0793f48dbee8?auto=format&fit=crop&w=1950&q=80',
+  //   rating: 4.6,
+  //   reviews: 489,
+  //   price: 1999,
+  // },
+  // {
+  //   id: 12,
+  //   name: 'Reykjavík, Iceland',
+  //   image: 'https://images.unsplash.com/photo-1586796878190-3158dcf8322e?auto=format&fit=crop&w=1950&q=80',
+  //   rating: 4.9,
+  //   reviews: 344,
+  //   price: 1899,
+  // },
+  // {
+  //   id: 13,
+  //   name: 'New York City, USA',
+  //   image: 'https://images.unsplash.com/photo-1533106418989-88406c7cfd1b?auto=format&fit=crop&w=1950&q=80',
+  //   rating: 4.7,
+  //   reviews: 850,
+  //   price: 1599,
+  // },
+  // {
+  //   id: 14,
+  //   name: 'Sydney, Australia',
+  //   image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d7?auto=format&fit=crop&w=1950&q=80',
+  //   rating: 4.8,
+  //   reviews: 478,
+  //   price: 1890,
+  // },
+  // {
+  //   id: 15,
+  //   name: 'Petra, Jordan',
+  //   image: 'https://images.unsplash.com/photo-1581118480243-e2fb01c5d4a0?auto=format&fit=crop&w=1950&q=80',
+  //   rating: 4.9,
+  //   reviews: 256,
+  //   price: 1620,
+  // },
+  // {
+  //   id: 16,
+  //   name: 'Zermatt, Switzerland',
+  //   image: 'https://images.unsplash.com/photo-1583142305729-76c2dbafc97f?auto=format&fit=crop&w=1950&q=80',
+  //   rating: 4.8,
+  //   reviews: 390,
+  //   price: 2100,
+  // },
+  // {
+  //   id: 17,
+  //   name: 'Hanoi, Vietnam',
+  //   image: 'https://images.unsplash.com/photo-1553524789-7241bb691973?auto=format&fit=crop&w=1950&q=80',
+  //   rating: 4.6,
+  //   reviews: 284,
+  //   price: 1320,
+  // },
+  // {
+  //   id: 18,
+  //   name: 'Cape Town, South Africa',
+  //   image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1950&q=80',
+  //   rating: 4.7,
+  //   reviews: 388,
+  //   price: 1495,
+  // },
+  // {
+  //   id: 19,
+  //   name: 'Amsterdam, Netherlands',
+  //   image: 'https://images.unsplash.com/photo-1503152394-98b6f43f08dd?auto=format&fit=crop&w=1950&q=80',
+  //   rating: 4.8,
+  //   reviews: 410,
+  //   price: 1380,
+  // },
+  // {
+  //   id: 20,
+  //   name: 'Prague, Czech Republic',
+  //   image: 'https://images.unsplash.com/photo-1526655009434-6b4e04f9d160?auto=format&fit=crop&w=1950&q=80',
+  //   rating: 4.9,
+  //   reviews: 390,
+  //   price: 1400,
+  // },
 ];
-
 const AllDestinations = () => {
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-10">All Destinations</h2>
+        <div className="flex justify-between items-center mb-10">
+          <h2 className="text-3xl font-bold text-gray-900">All Destinations</h2>
+          <Link
+            to={getHomePath()}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow"
+          >
+            Back to Home
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {destinations.map((destination) => (
             <Link
@@ -207,4 +216,4 @@ const AllDestinations = () => {
   );
 };
 
-export default AllDestinations; // ✅ This is required
+export default AllDestinations;

@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
-
+import packageRoutes from './routes/packageRoutes.js'
+import districtRoutes from './routes/districtRoutes.js'
 dotenv.config();
 connectDB();
 
@@ -12,14 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const allowedOrigins = [
-  'https://travelforall.vercel.app'
-];
 
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
-}));
 
 app.get("/",(req,res)=>{
   res.send("Backend is running");
@@ -27,8 +21,13 @@ app.get("/",(req,res)=>{
 
 // Routes
 app.use('/', authRoutes);
+app.use('/', packageRoutes);
+app.use('/', districtRoutes);
+// app.use('/api/packages', packageRoutes);
+
+
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT,'0.0.0.0', () => {
+app.listen(PORT, () => {
   console.log(`🚀 Server running at ${PORT}`);
 });

@@ -1,3 +1,4 @@
+// src/pages/LoginPage.tsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -5,32 +6,34 @@ import Footer from '@/components/Footer';
 import { Button } from "@/components/ui/button";
 import { LogIn, Mail, Lock } from 'lucide-react';
 import axios from 'axios';
-import BASE_URL from "../utils/baseUrl"; // Adjust path as needed
-// import { toast } from 'sonner';
+import BASE_URL from "../utils/baseUrl";
 import toast from 'react-hot-toast';
-
-
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    
     try {
       const res = await axios.post(`${BASE_URL}/login`, { email, password });
-      const user = res.data.user;
-    const userId = user._id || user.id; 
-
-       alert('Login successful');
-      // Optional: Store token
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-
-      navigate(`/user/${userId}`); // Redirect to home or dashboard
+      const { token, user } = res.data;
+      // console.log('token',token )
+      
+      // Store user data and token
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      toast.success('Login successful');
+      navigate(`/user/${user.id}`);
     } catch (error) {
-      alert(error.response?.data?.message || 'Login failed');
+      toast.error(error.response?.data?.message || 'Login failed');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,9 +86,9 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <Button className="w-full flex justify-center py-6" type="submit">
+            <Button className="w-full flex justify-center py-6" type="submit" disabled={isLoading}>
               <LogIn className="mr-2 h-5 w-5" />
-              Sign in
+              {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
 
             <div className="text-center mt-4">

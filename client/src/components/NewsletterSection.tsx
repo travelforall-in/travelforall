@@ -39,6 +39,7 @@
 import React, { useState } from 'react';
 import { Send } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import BASE_URL from '@/utils/baseUrl';
 
 const NewsletterSection = () => {
   const [email, setEmail] = useState('');
@@ -46,7 +47,7 @@ const NewsletterSection = () => {
 
   const handleSubscribe = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/subscribe', {
+      const response = await fetch(`${BASE_URL}/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
