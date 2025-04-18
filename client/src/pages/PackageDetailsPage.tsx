@@ -70,12 +70,32 @@ const PackageDetailsPage = () => {
     });
   };
 
-  const handleAddToWishlist = () => {
-    toast({
-      title: "Added to wishlist",
-      description: `${packageData.name} has been added to your wishlist.`,
-    });
+  type PackageData = {
+    id: string;
+    name: string;
+    description: string;
+    // Add other fields as needed
   };
+  
+  const handleAddToWishlist = () => {
+    const storedWishlist: PackageData[] = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    const isAlreadyInWishlist = storedWishlist.some(item => item.id === packageData.id);
+  
+    if (!isAlreadyInWishlist) {
+      const updatedWishlist = [...storedWishlist, packageData];
+      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+      toast({
+        title: "Added to wishlist",
+        description: `${packageData.name} has been added to your wishlist.`,
+      });
+    } else {
+      toast({
+        title: "Already in wishlist",
+        description: `${packageData.name} is already in your wishlist.`,
+      });
+    }
+  };
+  
 
   // Available dates for this package
   const availableDates = [

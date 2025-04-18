@@ -1,37 +1,170 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
+// import React from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
 
-const SearchResultsPage = () => {
+// interface Package {
+//   _id: string;
+//   title: string;
+//   description: string;
+//   image: string;
+//   price: number;
+// }
+
+// interface LocationState {
+//   data?: Package[];
+//   destination?: string;
+// }
+
+// const SearchResultsPage: React.FC = () => {
+//   const location = useLocation();
+//   const navigate = useNavigate();
+//   const state = location.state as LocationState | null;
+
+//   // Use optional chaining and default values
+//   const data = state?.data || [];
+//   const destination = state?.destination || "N/A";
+
+//   console.log("Data received:", data);
+//   console.log("Destination:", destination);
+
+//   const handlePackageClick = (pkg: Package) => {
+//     navigate(`/package/${pkg._id}`, { state: { package: pkg } });
+//   };
+
+//   return (
+//     <div className="max-w-7xl mx-auto px-4 py-10">
+//       <h2 className="text-3xl font-bold mb-4">
+//         Packages for {destination}
+//       </h2>
+
+//       {data.length === 0 ? (
+//         <p>No packages found for this destination.</p>
+//       ) : (
+//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//           {data.map((pkg) => (
+//             <div
+//               key={pkg._id}
+//               className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition"
+//               onClick={() => handlePackageClick(pkg)}
+//             >
+//               <img
+//                 src={pkg.image}
+//                 alt={pkg.title}
+//                 className="w-full h-48 object-cover"
+//               />
+//               <div className="p-4">
+//                 <h3 className="text-xl font-semibold">{pkg.title}</h3>
+//                 <p className="text-gray-600 mt-2 line-clamp-2">
+//                   {pkg.description}
+//                 </p>
+//                 <p className="text-primary font-bold mt-4">₹{pkg.price}</p>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default SearchResultsPage;
+
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
+interface Package {
+  _id: string;
+  title: string;
+  description: string;
+  image: string;
+  price: number;
+  dateRange?: {
+    startDate?: string;
+    endDate?: string;
+  };
+}
+
+interface LocationState {
+  data?: Package[];
+  destination?: string;
+  checkIn?: string;
+  checkOut?: string;
+}
+
+const SearchResultsPage: React.FC = () => {
   const location = useLocation();
-  const { data = [], from, to, checkIn, checkOut } = location.state || {};
+  const navigate = useNavigate();
+  const state = location.state as LocationState | null;
+
+  // Safely extract data with defaults
+  const data = Array.isArray(state?.data) ? state.data : [];
+  const destination = state?.destination || "All Destinations";
+  const checkIn = state?.checkIn;
+  const checkOut = state?.checkOut;
+
+  const handlePackageClick = (pkg: Package) => {
+    navigate(`/package/${pkg._id}`, { state: { package: pkg } });
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
-      <h2 className="text-3xl font-bold mb-4">
-        Packages from {from || "N/A"} to {to || "N/A"}
-      </h2>
-      <p className="text-gray-600 mb-8">
-        Check-in: {checkIn || "N/A"} | Check-out: {checkOut || "N/A"}
-      </p>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold mb-2">
+          Packages {destination !== "All Destinations" ? `for ${destination}` : ''}
+        </h2>
+        {(checkIn || checkOut) && (
+          <p className="text-gray-600">
+            {checkIn && `From: ${formatDate(checkIn)} `}
+            {checkOut && `To: ${formatDate(checkOut)}`}
+          </p>
+        )}
+      </div>
 
       {data.length === 0 ? (
-        <p>No packages found for this route.</p>
+        <div className="bg-white rounded-lg shadow p-8 text-center">
+          <p className="text-lg">No packages found for your search criteria.</p>
+          <button 
+            onClick={() => navigate('/packages')}
+            className="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition"
+          >
+            Browse All Packages
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {data.map((pkg) => (
             <div
               key={pkg._id}
-              className="bg-white rounded-xl shadow-md overflow-hidden"
+              className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition"
+              onClick={() => handlePackageClick(pkg)}
             >
               <img
-                src={pkg.image}
+                src={pkg.image || 'https://via.placeholder.com/300x200?text=No+Image'}
                 alt={pkg.title}
                 className="w-full h-48 object-cover"
               />
               <div className="p-4">
-                <h3 className="text-xl font-semibold">{pkg.title}</h3>
-                <p className="text-gray-600 mt-2">{pkg.description}</p>
-                <p className="text-primary font-bold mt-4">₹{pkg.price}</p>
+                <h3 className="text-xl font-semibold">{pkg.title || 'Untitled Package'}</h3>
+                {pkg.dateRange?.startDate && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    {formatDate(pkg.dateRange.startDate)}
+                    {pkg.dateRange.endDate && ` - ${formatDate(pkg.dateRange.endDate)}`}
+                  </p>
+                )}
+                <p className="text-gray-600 mt-2 line-clamp-2">
+                  {pkg.description || 'No description available'}
+                </p>
+                <p className="text-primary font-bold mt-4">
+                  ₹{pkg.price?.toLocaleString('en-IN') || 'Price not available'}
+                </p>
               </div>
             </div>
           ))}

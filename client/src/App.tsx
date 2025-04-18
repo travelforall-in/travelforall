@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import PackagesPage from "./pages/PackagesPage";
+// import PackagesPage from "./pages/PackagesPage";
 import PackageDetailsPage from "./pages/PackageDetailsPage";
 import NotFound from "./pages/NotFound";
 import AllDestinations from "./components/AllDestinations";
@@ -18,6 +18,15 @@ import ContactUs from "./pages/ContactUs";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import SearchResultsPage from "./pages/SearchResultsPage";
+import AllPackages from "./pages/AllPackages";
+import MyPackages from "./pages/MyPackages";
+import WishlistPage from "./components/WishlistPage";
+import Domestic from "./pages/Domestic";
+import PackagesPage from "./pages/PackagesPage";
+import BookingPage from "./pages/BookingPage";
+import PaymentPage from "./pages/PaymentPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import Account from "./pages/Account";
 
 const queryClient = new QueryClient();
 
@@ -32,12 +41,20 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
-          <Route path="/packages" element={<PackagesPage />} />
+          <Route path="/packages/:destinationId" element={<PackagesPage />} />
           <Route path="/package/:id" element={<PackageDetailsPage />} />
           <Route path="/destinations" element={<AllDestinations />} />
           <Route path="/explore-packages" element={<ExplorePackages />} />
           <Route path="/search-results" element={<SearchResultsPage />} />
-
+          <Route path="/packages" element={<AllPackages />} />
+          <Route path="/package/:id" element={<PackageDetailsPage />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/my-packages" element={<MyPackages />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/destinations/:type" element={<Domestic />} />
+          <Route path="/booking/:packageId" element={<BookingPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/payment-success" element={<PaymentSuccessPage />} />
 
           {/* Auth-protected routes */}
           <Route element={<ProtectedRoute />}>
