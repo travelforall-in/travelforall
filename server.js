@@ -37,20 +37,22 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/packages', require('./routes/packageRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 
-// New routes for custom packages and wishlist
+// User-related routes
+app.use('/api/users', require('./routes/userRoutes'));
+
+// Custom packages and wishlist routes
 app.use('/api/custom-packages', require('./routes/customPackageRoutes'));
 app.use('/api/wishlist', require('./routes/wishlistRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/admin/custom-packages', require('./routes/adminCustomPackageRoutes'));
-app.use('/api/wishlist', require('./routes/wishlistRoutes'));
 
-app.use('/api/packages', require('./routes/packageRoutes'));
-app.use('/api/wishlist', require('./routes/wishlistRoutes'));
-
+// New location, hotel, and transportation routes
+app.use('/api/locations', require('./routes/locationRoutes'));
+app.use('/api/hotels', require('./routes/hotelRoutes'));
+app.use('/api/transportation', require('./routes/transportationRoutes'));
 
 // Home route
 app.get('/', (req, res) => {
-  res.send('Travel Booking API is running with Custom Package and Wishlist features');
+  res.send('Travel Booking API is running with Location, Hotel, Transportation, Custom Package and Wishlist features');
 });
 
 // Catch-all route for frontend routing (uncomment when you have frontend)

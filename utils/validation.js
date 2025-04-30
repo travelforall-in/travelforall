@@ -1,68 +1,5 @@
+// utils/validation.js
 const { body, validationResult } = require('express-validator');
-
-
-
-
-// Common validation rules
-exports.registerValidation = [
-  body('name').notEmpty().withMessage('Name is required'),
-  body('email').isEmail().withMessage('Please include a valid email'),
-  body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters'),
-];
-
-exports.loginValidation = [
-  body('email').isEmail().withMessage('Please include a valid email'),
-  body('password').exists().withMessage('Password is required'),
-];
-
-
-
-
-
-
-// Booking validation rules
-exports.bookingValidation = [
-  body('packageId')
-    .notEmpty()
-    .withMessage('Package ID is required'),
-  
-  body('travelDate')
-    .notEmpty()
-    .withMessage('Travel date is required')
-    .isISO8601()
-    .withMessage('Invalid date format'),
-  
-  body('travelers.adults')
-    .notEmpty()
-    .withMessage('Number of adults is required')
-    .isInt({ min: 1 })
-    .withMessage('At least one adult is required'),
-  
-  body('travelers.children')
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage('Number of children must be a non-negative integer'),
-  
-  body('travelers.infants')
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage('Number of infants must be a non-negative integer'),
-  
-  body('contactDetails.email')
-    .optional()
-    .isEmail()
-    .withMessage('Invalid email format'),
-  
-  body('contactDetails.phone')
-    .optional()
-    .isMobilePhone()
-    .withMessage('Invalid phone number'),
-];
-
-
-
 
 // Validation middleware
 exports.validate = (validations) => {
@@ -72,7 +9,18 @@ exports.validate = (validations) => {
       'highlights', 
       'inclusions', 
       'exclusions', 
-      'itinerary'
+      'itinerary',
+      'amenities',
+      'roomTypes',
+      'contactInfo',
+      'policies',
+      'priceRange',
+      'routes',
+      'destinations',
+      'bookingInformation',
+      'attractions',
+      'travelTips',
+      'weather'
     ];
 
     fieldsToParseAsJSON.forEach(field => {
@@ -95,7 +43,9 @@ exports.validate = (validations) => {
 
     // Convert primitive fields
     if (req.body.price) req.body.price = parseFloat(req.body.price);
-    if (req.body.featured) req.body.featured = req.body.featured === 'true';
+    if (req.body.budget) req.body.budget = parseFloat(req.body.budget);
+    if (req.body.rating) req.body.rating = parseFloat(req.body.rating);
+    if (req.body.featured !== undefined) req.body.featured = req.body.featured === 'true';
 
     // Run validations
     for (let validation of validations) {
@@ -114,6 +64,35 @@ exports.validate = (validations) => {
     });
   };
 };
+
+// Common validation rules
+exports.registerValidation = [
+  body('name')
+    .notEmpty()
+    .withMessage('Name is required'),
+  
+  body('email')
+    .isEmail()
+    .withMessage('Please include a valid email'),
+  
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters'),
+  
+  body('phone')
+    .notEmpty()
+    .withMessage('Phone number is required')
+];
+
+exports.loginValidation = [
+  body('email')
+    .isEmail()
+    .withMessage('Please include a valid email'),
+  
+  body('password')
+    .exists()
+    .withMessage('Password is required')
+];
 
 // Package validation rules
 exports.packageValidation = [
@@ -164,23 +143,47 @@ exports.packageValidation = [
   
   body('accommodation')
     .notEmpty()
-    .withMessage('Accommodation is required'),
+    .withMessage('Accommodation is required')
 ];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-// utils/validation.js - Add this to your existing validation file
+// Booking validation rules
+exports.bookingValidation = [
+  body('packageId')
+    .notEmpty()
+    .withMessage('Package ID is required'),
+  
+  body('travelDate')
+    .notEmpty()
+    .withMessage('Travel date is required')
+    .isISO8601()
+    .withMessage('Invalid date format'),
+  
+  body('travelers.adults')
+    .notEmpty()
+    .withMessage('Number of adults is required')
+    .isInt({ min: 1 })
+    .withMessage('At least one adult is required'),
+  
+  body('travelers.children')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Number of children must be a non-negative integer'),
+  
+  body('travelers.infants')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Number of infants must be a non-negative integer'),
+  
+  body('contactDetails.email')
+    .optional()
+    .isEmail()
+    .withMessage('Invalid email format'),
+  
+  body('contactDetails.phone')
+    .optional()
+    .isMobilePhone()
+    .withMessage('Invalid phone number')
+];
 
 // Custom Package validation schema
 exports.customPackageValidation = [
@@ -277,99 +280,212 @@ exports.customPackageValidation = [
     .withMessage('Infants count must be a non-negative number')
 ];
 
-
-
-// Custom Package validation schema
-exports.customPackageValidation = [
-  // Basic info validation
+// Location validation
+exports.locationValidation = [
   body('name')
     .notEmpty()
-    .withMessage('Package name is required')
-    .isLength({ min: 3, max: 100 })
-    .withMessage('Name must be between 3 and 100 characters'),
+    .withMessage('Name is required')
+    .trim(),
   
-  body('destination')
+  body('country')
     .notEmpty()
-    .withMessage('Destination is required'),
+    .withMessage('Country is required')
+    .trim(),
   
-  body('startDate')
+  body('description')
     .notEmpty()
-    .withMessage('Start date is required')
-    .isISO8601()
-    .withMessage('Invalid date format')
-    .custom((value) => {
-      const startDate = new Date(value);
-      const currentDate = new Date();
-      if (startDate < currentDate) {
-        throw new Error('Start date must be in the future');
-      }
-      return true;
-    }),
+    .withMessage('Description is required'),
   
-  body('endDate')
-    .notEmpty()
-    .withMessage('End date is required')
-    .isISO8601()
-    .withMessage('Invalid date format')
-    .custom((value, { req }) => {
-      const startDate = new Date(req.body.startDate);
-      const endDate = new Date(value);
-      if (endDate <= startDate) {
-        throw new Error('End date must be after start date');
-      }
-      return true;
-    }),
-  
-  // Accommodation validation
-  body('accommodation.type')
-    .notEmpty()
-    .withMessage('Accommodation type is required')
-    .isIn(['hotel', 'resort', 'hostel', 'guesthouse', 'apartment'])
-    .withMessage('Invalid accommodation type'),
-  
-  body('accommodation.preferredRating')
+  body('region')
     .optional()
+    .trim(),
+  
+  body('bestTimeToVisit')
+    .optional()
+    .trim(),
+  
+  body('featured')
+    .optional()
+    .isBoolean()
+    .withMessage('Featured must be a boolean value'),
+  
+  body('popularityIndex')
+    .optional()
+    .isNumeric()
+    .withMessage('Popularity index must be a number'),
+  
+  body('attractions')
+    .optional()
+    .isArray()
+    .withMessage('Attractions must be an array'),
+  
+  body('travelTips')
+    .optional()
+    .isArray()
+    .withMessage('Travel tips must be an array')
+];
+
+// Hotel validation
+exports.hotelValidation = [
+  body('name')
+    .notEmpty()
+    .withMessage('Name is required')
+    .trim(),
+  
+  body('location')
+    .notEmpty()
+    .withMessage('Location ID is required')
+    .isMongoId()
+    .withMessage('Invalid location ID format'),
+  
+  body('address')
+    .notEmpty()
+    .withMessage('Address is required')
+    .trim(),
+  
+  body('description')
+    .notEmpty()
+    .withMessage('Description is required'),
+  
+  body('category')
+    .notEmpty()
+    .withMessage('Category is required')
+    .isIn(['budget', 'standard', 'premium', 'luxury', 'resort'])
+    .withMessage('Invalid category'),
+  
+  body('rating')
+    .optional()
+    .isFloat({ min: 1, max: 5 })
+    .withMessage('Rating must be between 1 and 5'),
+  
+  body('priceRange.min')
+    .notEmpty()
+    .withMessage('Minimum price is required')
+    .isNumeric()
+    .withMessage('Minimum price must be a number'),
+  
+  body('priceRange.max')
+    .notEmpty()
+    .withMessage('Maximum price is required')
+    .isNumeric()
+    .withMessage('Maximum price must be a number')
+    .custom((value, { req }) => {
+      const min = parseFloat(req.body.priceRange.min);
+      const max = parseFloat(value);
+      if (max <= min) {
+        throw new Error('Maximum price must be greater than minimum price');
+      }
+      return true;
+    }),
+  
+  body('roomTypes')
+    .optional()
+    .isArray()
+    .withMessage('Room types must be an array'),
+  
+  body('amenities')
+    .optional()
+    .isArray()
+    .withMessage('Amenities must be an array'),
+  
+  body('featured')
+    .optional()
+    .isBoolean()
+    .withMessage('Featured must be a boolean value')
+];
+
+// Hotel review validation
+exports.hotelReviewValidation = [
+  body('rating')
+    .notEmpty()
+    .withMessage('Rating is required')
     .isInt({ min: 1, max: 5 })
     .withMessage('Rating must be between 1 and 5'),
   
-  // Transportation validation  
-  body('transportation.flights.preferredClass')
-    .optional()
-    .isIn(['economy', 'premium_economy', 'business', 'first'])
-    .withMessage('Invalid flight class'),
-  
-  body('transportation.localTransport')
-    .optional()
-    .isIn(['public', 'private', 'rental'])
-    .withMessage('Invalid local transport option'),
-  
-  // Budget validation
-  body('budget')
+  body('title')
     .notEmpty()
-    .withMessage('Budget is required')
+    .withMessage('Title is required')
+    .trim(),
+  
+  body('comment')
+    .notEmpty()
+    .withMessage('Comment is required')
+    .trim()
+];
+
+// Transportation validation
+exports.transportationValidation = [
+  body('name')
+    .notEmpty()
+    .withMessage('Name is required')
+    .trim(),
+  
+  body('type')
+    .notEmpty()
+    .withMessage('Type is required')
+    .isIn(['bus', 'train', 'flight', 'ferry', 'cruise', 'taxi'])
+    .withMessage('Invalid transportation type'),
+  
+  body('operator')
+    .notEmpty()
+    .withMessage('Operator name is required')
+    .trim(),
+  
+  body('description')
+    .notEmpty()
+    .withMessage('Description is required'),
+  
+  body('destinations')
+    .optional()
+    .isArray()
+    .withMessage('Destinations must be an array'),
+  
+  body('routes')
+    .optional()
+    .isArray()
+    .withMessage('Routes must be an array'),
+  
+  body('routes.*.from')
+    .optional()
+    .isMongoId()
+    .withMessage('From location ID must be valid'),
+  
+  body('routes.*.to')
+    .optional()
+    .isMongoId()
+    .withMessage('To location ID must be valid'),
+  
+  body('routes.*.price')
+    .optional()
     .isNumeric()
-    .withMessage('Budget must be a number')
-    .custom((value) => {
-      if (parseFloat(value) <= 0) {
-        throw new Error('Budget must be greater than 0');
-      }
-      return true;
-    }),
+    .withMessage('Route price must be a number'),
   
-  // Travelers validation
-  body('travelers.adults')
+  body('amenities')
+    .optional()
+    .isArray()
+    .withMessage('Amenities must be an array'),
+  
+  body('featured')
+    .optional()
+    .isBoolean()
+    .withMessage('Featured must be a boolean value')
+];
+
+// Transportation review validation
+exports.transportationReviewValidation = [
+  body('rating')
     .notEmpty()
-    .withMessage('Number of adults is required')
-    .isInt({ min: 1 })
-    .withMessage('At least one adult is required'),
+    .withMessage('Rating is required')
+    .isInt({ min: 1, max: 5 })
+    .withMessage('Rating must be between 1 and 5'),
   
-  body('travelers.children')
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage('Children count must be a non-negative number'),
+  body('title')
+    .notEmpty()
+    .withMessage('Title is required')
+    .trim(),
   
-  body('travelers.infants')
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage('Infants count must be a non-negative number')
+  body('comment')
+    .notEmpty()
+    .withMessage('Comment is required')
+    .trim()
 ];
