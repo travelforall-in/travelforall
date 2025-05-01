@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
 import FeaturedDestinations from '@/components/FeaturedDestinations';
-import PopularPackages from '@/components/PopularPackages';
+// import PopularPackages from '@/components/PopularPackages';
 import Testimonials from '@/components/Testimonials';
 import NewsletterSection from '@/components/NewsletterSection';
 import { useParams } from 'react-router-dom';
@@ -18,7 +18,7 @@ const Index = () => {
       <main className="flex-grow pt-16">
         <HeroSection />
         <FeaturedDestinations />
-        <PopularPackages />
+        {/* <PopularPackages /> */}
         <Testimonials />
         <NewsletterSection />
       </main>

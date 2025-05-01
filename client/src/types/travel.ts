@@ -2,7 +2,7 @@ export interface Destination {
     id: string;
     name: string;
     type: 'domestic' | 'international';
-    category: 'Adventure' | 'Honeymoon' | 'Family' | 'Solo' | 'Group' | 'Corporate';
+    category: 'Student'|'Adventure' | 'Honeymoon' | 'Family' | 'Solo' | 'Group' | 'Corporate';
     price: number;
     image: string;
     description: string;
@@ -28,4 +28,4 @@ export interface Destination {
     packageId: string;
   }
   
-  export type CategoryFilter = 'Adventure' | 'Honeymoon' | 'Family' | 'Solo' | 'Group' | 'Corporate' | 'All';
+  export type CategoryFilter = 'Student' |'Adventure' | 'Honeymoon' | 'Family' | 'Solo' | 'Group' | 'Corporate' | 'All';

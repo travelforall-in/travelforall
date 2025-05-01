@@ -1,4 +1,3 @@
-// src/pages/LoginPage.tsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -7,31 +6,47 @@ import { Button } from "@/components/ui/button";
 import { LogIn, Mail, Lock } from 'lucide-react';
 import axios from 'axios';
 import BASE_URL from "../utils/baseUrl";
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      const res = await axios.post(`${BASE_URL}/login`, { email, password });
+      const res = await axios.post(`${BASE_URL}/auth/login`, formData);
       const { token, user } = res.data;
-      // console.log('token',token )
       
-      // Store user data and token
+      // Store authentication data
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
       
       toast.success('Login successful');
-      navigate(`/user/${user.id}`);
+      
+      // Redirect based on user role
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate(`/user/${user._id}`);
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Login failed');
+      console.error('Login error:', error);
+      toast.error(error.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -52,41 +67,70 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email address
+                </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
                     id="email"
                     name="email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleChange}
                     required
-                    className="pl-10 w-full rounded-md border border-gray-300 py-2 px-3"
+                    className="pl-10 w-full rounded-md border border-gray-300 shadow-sm focus:border-primary focus:ring-primary py-2 px-3"
                     placeholder="you@example.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
                     id="password"
                     name="password"
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleChange}
                     required
-                    className="pl-10 w-full rounded-md border border-gray-300 py-2 px-3"
+                    minLength={6}
+                    className="pl-10 w-full rounded-md border border-gray-300 shadow-sm focus:border-primary focus:ring-primary py-2 px-3"
                     placeholder="••••••••"
                   />
                 </div>
               </div>
             </div>
 
-            <Button className="w-full flex justify-center py-6" type="submit" disabled={isLoading}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                  Remember me
+                </label>
+              </div>
+
+              <div className="text-sm">
+                <Link to="/forgot-password" className="text-primary hover:text-primary/80 font-medium">
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full flex justify-center py-6"
+              disabled={isLoading}
+            >
               <LogIn className="mr-2 h-5 w-5" />
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
