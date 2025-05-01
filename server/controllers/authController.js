@@ -1,95 +1,220 @@
-import express from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import Subscriber from '../models/Subscriber.js';
-import User from '../models/User.js';
+//authController.js
+const User = require('../models/User');
+const Admin = require('../models/Admin');
+const { sendTokenResponse } = require('../utils/jwtToken');
+const BlacklistedToken = require('../models/BlacklistedToken');
+const jwt = require('jsonwebtoken');
+const config = require('../config/config');
 
-export const signup = async (req, res) => {
-  const { firstName, lastName, email, password, passwordConfirm } = req.body;
 
-  if (password !== passwordConfirm) {
-    return res.status(400).json({ message: "Passwords do not match" });
-  }
 
+// @desc    Register user
+// @route   POST /api/auth/register
+// @access  Public
+exports.registerUser = async (req, res) => {
   try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({ message: "Email already exists" });
+    const { name, email, password, phone } = req.body;
+
+    // Check if user already exists
+    const userExists = await User.findOne({ email });
+
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        message: 'User already exists',
+      });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new User({
-      firstName,
-      lastName,
+    // Create user
+    const user = await User.create({
+      name,
       email,
-      password: hashedPassword,
+      password,
+      phone,
     });
 
-    await newUser.save();
-
-    res.status(201).json({ message: "User registered successfully" });
-
+    sendTokenResponse(user, 201, res);
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
   }
 };
 
-// LOGIN
- export const login = async (req, res) => {
-  const { email, password } = req.body;
-  console.log(req.body);
-
+// @desc    Login user
+// @route   POST /api/auth/login
+// @access  Public
+exports.loginUser = async (req, res) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const { email, password } = req.body;
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) return res.status(401).json({ message: "Invalid password" });
+    // Check for user
+    const user = await User.findOne({ email }).select('+password');
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials',
+      });
+    }
 
-    // console.log('LocalStorage:', {
-    //   token: localStorage.getItem('token'),
-    //   user: localStorage.getItem('user'),
-    //   users: localStorage.getItem('users')
-    // });
+    // Check if password matches
+    const isMatch = await user.matchPassword(password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials',
+      });
+    }
+
+    sendTokenResponse(user, 200, res);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
+  }
+};
+
+// @desc    Register admin
+// @route   POST /api/auth/admin/register
+// @access  Public
+exports.registerAdmin = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    // Check if admin already exists
+    const adminExists = await Admin.findOne({ email });
+
+    if (adminExists) {
+      return res.status(400).json({
+        success: false,
+        message: 'Admin already exists',
+      });
+    }
+
+    // Create admin
+    const admin = await Admin.create({
+      name,
+      email,
+      password,
+    });
+
+    sendTokenResponse(admin, 201, res);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
+  }
+};
+
+// @desc    Login admin
+// @route   POST /api/auth/admin/login
+// @access  Public
+exports.loginAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check for admin
+    const admin = await Admin.findOne({ email }).select('+password');
+
+    if (!admin) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials',
+      });
+    }
+
+    // Check if password matches
+    const isMatch = await admin.matchPassword(password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials',
+      });
+    }
+
+    sendTokenResponse(admin, 200, res);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
+  }
+};
+
+// @desc    Get current logged in user
+// @route   GET /api/auth/me
+// @access  Private
+exports.getMe = async (req, res) => {
+  try {
+    const user = req.user;
 
     res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-      },
+      success: true,
+      data: user,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
   }
 };
 
-
-// SUBSCRIBE
-export const subscribe = async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ message: 'Email is required.' });
-  }
-
+// @desc    Logout admin user
+// @route   GET /api/admin/logout
+// @access  Private/Admin
+exports.logout = async (req, res) => {
   try {
-    const existing = await Subscriber.findOne({ email });
-    if (existing) {
-      return res.status(409).json({ message: 'Email already subscribed.' });
-    }
+    res.cookie('token', 'none', {
+      expires: new Date(Date.now() + 10 * 1000), // Expires in 10 seconds
+      httpOnly: true
+    });
 
-    await Subscriber.create({ email });
-    return res.status(200).json({ message: 'Thanks for subscribing!' });
-
+    res.status(200).json({
+      success: true,
+      message: 'Admin logged out successfully'
+    });
   } catch (error) {
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
   }
 };
 
+
+// @desc    Logout user/admin
+// @route   POST /api/auth/logout
+// @access  Private
+exports.logout = async (req, res) => {
+  try {
+    // Get token from header
+    const token = req.headers.authorization.split(' ')[1];
+    
+    // Decode token to get expiration time
+    const decoded = jwt.verify(token, config.jwtSecret);
+    const exp = new Date(decoded.exp * 1000); // Convert to milliseconds
+    
+    // Add token to blacklist
+    await BlacklistedToken.create({
+      token,
+      expiresAt: exp
+    });
+    
+    res.status(200).json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};

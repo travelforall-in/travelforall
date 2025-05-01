@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
+import Card from '@/components/shared/Card';
 
 const Account = () => {
   const navigate = useNavigate();
@@ -13,6 +14,39 @@ const Account = () => {
     setCurrency(value);
     localStorage.setItem('preferredCurrency', value);
   };
+  const items = [
+    {
+      label: "Profile Settings",
+      desc: "Update your personal information and password.",
+      route: "/account-settings",
+      btnName: "Manage"
+    },
+    {
+      label: "My Bookings",
+      desc: "View all your current and past travel plans.",
+      route: "/my-packages",
+      btnName: "View"
+    },
+    {
+      label: "Wishlist",
+      desc: "Access your favorite destinations anytime.",
+      route: "/wishlist",
+      btnName: "Open"
+    },
+    {
+      label: "Payment History",
+      desc: "Review transactions and billing records.",
+      route: "/payment-history",
+      btnName: "Check"
+    },
+    {
+      label: "Support",
+      desc: "Need help? Reach out to our support team.",
+      route: "/support",
+      btnName: "Contact"
+    }
+  ];
+  
 
   return (
     <>
@@ -35,39 +69,9 @@ const Account = () => {
         </Select>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="p-6 border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow transition">
-          <h2 className="text-xl font-semibold mb-2 text-gray-800">Profile Settings</h2>
-          <p className="text-gray-600 mb-4 text-sm">Update your personal information and password.</p>
-          <Button onClick={() => navigate('/account-settings')}>Manage</Button>
-        </div>
-
-        <div className="p-6 border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow transition">
-          <h2 className="text-xl font-semibold mb-2 text-gray-800">My Bookings</h2>
-          <p className="text-gray-600 mb-4 text-sm">View all your current and past travel plans.</p>
-          <Button onClick={() => navigate('/my-packages')}>View</Button>
-        </div>
-
-        <div className="p-6 border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow transition">
-          <h2 className="text-xl font-semibold mb-2 text-gray-800">Wishlist</h2>
-          <p className="text-gray-600 mb-4 text-sm">Access your favorite destinations anytime.</p>
-          <Button onClick={() => navigate('/wishlist')}>Open</Button>
-        </div>
-
-        <div className="p-6 border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow transition">
-          <h2 className="text-xl font-semibold mb-2 text-gray-800">Payment History</h2>
-          <p className="text-gray-600 mb-4 text-sm">Review transactions and billing records.</p>
-          <Button onClick={() => navigate('/payment-history')}>Check</Button>
-        </div>
-
-        <div className="p-6 border border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow transition">
-          <h2 className="text-xl font-semibold mb-2 text-gray-800">Support</h2>
-          <p className="text-gray-600 mb-4 text-sm">Need help? Reach out to our support team.</p>
-          <Button onClick={() => navigate('/support')}>Contact</Button>
-        </div>
-      </div>
+     <Card items={items}/>
     </div>
-    <Footer />
+    
     </>
   );
 };

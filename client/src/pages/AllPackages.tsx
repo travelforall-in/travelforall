@@ -1,6 +1,6 @@
 // src/pages/AllPackages.js
 import React from 'react';
-import { packages } from '../data/packages';
+// import { packages } from '../data/packages';
 import { PackageCard } from '../components/PopularPackages';
 
 const AllPackages = () => {
