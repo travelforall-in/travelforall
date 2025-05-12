@@ -27,6 +27,8 @@ import PaymentPage from "./pages/PaymentPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import Account from "./pages/Account";
 import PackageDetailsPage from "./pages/PackageDetailsPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminCreatePackage from "./pages/AdminCreatePackage";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +56,10 @@ const App = () => (
           <Route path="/booking/:packageId" element={<BookingPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/create-package" element={<AdminCreatePackage />} />
+
+
 
           {/* Auth-protected routes */}
           <Route element={<ProtectedRoute />}>
