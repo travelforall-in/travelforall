@@ -39,7 +39,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     // const res = await axios.post(endpoint, formData);
 
-    const res = await authService.creaste(parentKey, formData);
+    const res = await authService.create(parentKey, formData);
 
     const { token, user } = res.data;
     console.log('Login response:', res);
