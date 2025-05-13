@@ -7,6 +7,7 @@ import { UserPlus, User, Mail, Lock, Phone } from "lucide-react";
 import axios from "axios";
 import BASE_URL from "../utils/baseUrl";
 import { toast } from "sonner";
+import { authService } from "@/service/authService";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -71,7 +72,8 @@ const SignupPage = () => {
 
       try {
         const { passwordConfirm, ...userData } = userForm;
-        await axios.post(`${BASE_URL}/auth/register`, userData);
+        // await axios.post(`${BASE_URL}/auth/register`, userData);
+        await authService.create('register',userData)
         toast.success("User registered successfully!");
         navigate("/login");
       } catch (err) {
