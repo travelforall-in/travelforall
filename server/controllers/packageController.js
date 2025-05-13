@@ -380,7 +380,7 @@ exports.addReview = async (req, res) => {
 
 // @desc    Get featured packages
 // @route   GET /api/packages/featured
-// @access  Public
+// // @access  Public
 exports.getFeaturedPackages = async (req, res) => {
   try {
     const featuredPackages = await Package.find({ featured: true }).limit(6);
