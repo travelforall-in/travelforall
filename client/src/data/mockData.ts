@@ -31,7 +31,7 @@ export const destinations: Destination[] = [
     description: "Family-friendly forest adventure with activities for all ages",
     rating: 4.3
   },
-  // Add more destinations...
+  // Add more destinations. ..
 ];
 
 export const packages: Package[] = [

@@ -242,96 +242,152 @@
 
 
 
+// import { useEffect, useState } from 'react';
+// import { useParams, useNavigate } from 'react-router-dom';
+// import { Package, Destination } from '../types/travel';
+// import { packages, destinations } from '../data/mockData';
+// import Footer from '@/components/Footer';
+// import Navbar from '@/components/Navbar';
+
+// const PackagesPage = () => {
+//   const { destinationId } = useParams<{ destinationId: string }>();
+//   const navigate = useNavigate();
+//   const [destination, setDestination] = useState<Destination | null>(null);
+//   const [availablePackages, setAvailablePackages] = useState<Package[]>([]);
+
+//   useEffect(() => {
+//     if (destinationId) {
+//       const foundDestination = destinations.find(d => d.id === destinationId);
+//       setDestination(foundDestination || null);
+//       const foundPackages = packages.filter(p => p.destinationId === destinationId);
+//       setAvailablePackages(foundPackages);
+//     }
+//   }, [destinationId]);
+
+//   if (!destination) {
+//     return <div>Loading...</div>;
+//   }
+
+//   return (
+//     <>
+//     <Navbar />
+    
+//     <div className="min-h-screen bg-gray-50 py-16 px-4">
+//       <div className="max-w-7xl mx-auto">
+//         <div className="mb-12">
+//           <h1 className="text-3xl font-bold text-gray-900 mb-4">
+//             {destination.name} Packages
+//           </h1>
+//           <p className="text-gray-600">{destination.description}</p>
+//         </div>
+
+//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+//           {availablePackages.map((pkg) => (
+//             <div key={pkg.id} className="bg-white rounded-xl shadow-md overflow-hidden">
+//               <img
+//                 src={pkg.image}
+//                 alt={pkg.name}
+//                 className="h-48 w-full object-cover"
+//               />
+//               <div className="p-6">
+//                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
+//                   {pkg.name}
+//                 </h3>
+//                 <p className="text-gray-600 mb-4">{pkg.description}</p>
+//                 <div className="mb-4">
+//                   <h4 className="font-semibold text-gray-700 mb-2">Inclusions:</h4>
+//                   <ul className="list-disc list-inside text-gray-600">
+//                     {pkg.inclusions.map((inclusion, index) => (
+//                       <li key={index}>{inclusion}</li>
+//                     ))}
+//                   </ul>
+//                 </div>
+//                 <div className="flex items-center justify-between mt-6">
+//                   <div>
+//                     <span className="text-purple-600 font-bold text-xl">
+//                       ${pkg.price}
+//                     </span>
+//                     <span className="text-gray-500 ml-2">{pkg.duration}</span>
+//                   </div>
+//                   <button
+//                     onClick={() => navigate(`/booking/${pkg.id}`)}
+//                     className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+//                   >
+//                     Book Now
+//                   </button>
+//                 </div>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//         <button
+//             onClick={() => navigate(-1)}
+//             className="mt-10 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+//           >
+//             ← Back
+//           </button>
+//       </div>
+      
+//       </div>
+      
+//       <Footer />
+    
+//     </>
+//   );
+// };
+
+// export default PackagesPage;
+
+
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Package, Destination } from '../types/travel';
-import { packages, destinations } from '../data/mockData';
-import Footer from '@/components/Footer';
+import { useParams } from 'react-router-dom';
+import { Package } from '../types/travel';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import axios from 'axios';
 
 const PackagesPage = () => {
-  const { destinationId } = useParams<{ destinationId: string }>();
-  const navigate = useNavigate();
-  const [destination, setDestination] = useState<Destination | null>(null);
-  const [availablePackages, setAvailablePackages] = useState<Package[]>([]);
+  const { packageId } = useParams<{ packageId: string }>();
+  const [pkg, setPkg] = useState<Package | null>(null);
 
   useEffect(() => {
-    if (destinationId) {
-      const foundDestination = destinations.find(d => d.id === destinationId);
-      setDestination(foundDestination || null);
-      const foundPackages = packages.filter(p => p.destinationId === destinationId);
-      setAvailablePackages(foundPackages);
+    if (packageId) {
+      axios.get(`http://localhost:5000/api/packages/${packageId}`)
+        .then(res => setPkg(res.data))
+        .catch(err => console.error(err));  
     }
-  }, [destinationId]);
+  }, [packageId]);
 
-  if (!destination) {
-    return <div>Loading...</div>;
-  }
+  if (!pkg) return <div className="text-center py-20">Loading package details...</div>;
 
   return (
     <>
-    <Navbar />
-    
-    <div className="min-h-screen bg-gray-50 py-16 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            {destination.name} Packages
-          </h1>
-          <p className="text-gray-600">{destination.description}</p>
+      <Navbar />
+      <div className="max-w-4xl mx-auto px-4 py-10">
+        <img src={pkg.images.image} alt={pkg.packageName} className="w-full h-64 object-cover rounded-xl mb-6" />
+        <h1 className="text-3xl font-bold mb-2">{pkg.packageName}</h1>
+        <p className="text-gray-600 mb-4">{pkg.shortDescription}</p>
+
+        <div className="mb-4">
+          <h3 className="font-semibold">Duration:</h3>
+          <p>{pkg.duration.days} Days / {pkg.duration.nights} Nights</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {availablePackages.map((pkg) => (
-            <div key={pkg.id} className="bg-white rounded-xl shadow-md overflow-hidden">
-              <img
-                src={pkg.image}
-                alt={pkg.name}
-                className="h-48 w-full object-cover"
-              />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {pkg.name}
-                </h3>
-                <p className="text-gray-600 mb-4">{pkg.description}</p>
-                <div className="mb-4">
-                  <h4 className="font-semibold text-gray-700 mb-2">Inclusions:</h4>
-                  <ul className="list-disc list-inside text-gray-600">
-                    {pkg.inclusions.map((inclusion, index) => (
-                      <li key={index}>{inclusion}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="flex items-center justify-between mt-6">
-                  <div>
-                    <span className="text-purple-600 font-bold text-xl">
-                      ${pkg.price}
-                    </span>
-                    <span className="text-gray-500 ml-2">{pkg.duration}</span>
-                  </div>
-                  <button
-                    onClick={() => navigate(`/booking/${pkg.id}`)}
-                    className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-                  >
-                    Book Now
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="mb-4">
+          <h3 className="font-semibold">Price:</h3>
+          <p>{pkg.price.amount} {pkg.price.currency}</p>
         </div>
-        <button
-            onClick={() => navigate(-1)}
-            className="mt-10 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-          >
-            ← Back
-          </button>
+
+        <div className="mb-4">
+          <h3 className="font-semibold">Destinations:</h3>
+          <ul className="list-disc list-inside">
+            {pkg.destinations.map((dest, idx) => (
+              <li key={idx}>{dest.name}</li>
+            ))}
+          </ul>
+        </div>
       </div>
-      
-      </div>
-      
       <Footer />
-    
     </>
   );
 };

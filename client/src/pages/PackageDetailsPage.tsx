@@ -1,9 +1,107 @@
+// import { useEffect, useState } from 'react';
+// import { useParams } from 'react-router-dom';
+// import axios from 'axios';
+// import Navbar from '@/components/Navbar';
+// import Footer from '@/components/Footer';
+// import BASE_URL from '@/utils/baseUrl';
 
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Star, MapPin, Clock, User, Calendar, CheckCircle, Info, Heart } from 'lucide-react';
+// interface Package {
+//   _id: string;
+//   packageName: string;
+//   packageType: string;
+//   destinations: { city?: string; region?: string; country?: string; name?: string }[];
+//   duration: { days: number; nights: number };
+//   price: { amount: number; currency: string };
+//   images: { image: string };
+//   shortDescription: string;
+// }
+
+// const PackageDetailsPage = () => {
+//   const { packageId } = useParams<{ packageId: string }>();
+//   const [pkg, setPkg] = useState<Package | null>(null);
+//   const [error, setError] = useState<string | null>(null);
+
+//   useEffect(() => {
+//     if (packageId) {
+//       axios
+//         .get(`${BASE_URL}/api/packages/${packageId}`)
+//         .then((res) => {
+//           setPkg(res.data);
+//           setError(null);
+//         })
+//         .catch((err) => {
+//           console.error('Error fetching package:', err);
+//           setError('Failed to load package details.');
+//         });
+//     }
+//   }, [packageId]);
+
+//   if (error) {
+//     return <div className="text-center py-20 text-red-600">{error}</div>;
+//   }
+
+//   if (!pkg) {
+//     return <div className="text-center py-20">Loading package details...</div>;
+//   }
+
+//   return (
+//     <>
+//       <Navbar />
+//       <div className="max-w-4xl mx-auto px-4 py-10">
+//         <img
+//           src={pkg.images.image}
+//           alt={pkg.packageName}
+//           className="w-full h-64 object-cover rounded-xl mb-6"
+//         />
+//         <h1 className="text-3xl font-bold mb-2">{pkg.packageName}</h1>
+//         <p className="text-gray-600 mb-4">{pkg.shortDescription}</p>
+
+//         <div className="mb-4">
+//           <h3 className="font-semibold">Duration:</h3>
+//           <p>
+//             {pkg.duration.days} Days / {pkg.duration.nights} Nights
+//           </p>
+//         </div>
+
+//         <div className="mb-4">
+//           <h3 className="font-semibold">Price:</h3>
+//           <p>
+//             {pkg.price.amount} {pkg.price.currency}
+//           </p>
+//         </div>
+
+//         <div className="mb-4">
+//           <h3 className="font-semibold">Destinations:</h3>
+//           <ul className="list-disc list-inside">
+//             {pkg.destinations.map((dest, idx) => (
+//               <li key={idx}>
+//                 {dest.name || `${dest.city}, ${dest.region}, ${dest.country}`}
+//               </li>
+//             ))}
+//           </ul>
+//         </div>
+//       </div>
+//       <Footer />
+//     </>
+//   );
+// };
+
+// export default PackageDetailsPage;
+
+
+import { useEffect, useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { 
+  Star, 
+  MapPin, 
+  Clock, 
+  User, 
+  Calendar, 
+  CheckCircle, 
+  Info, 
+  Heart 
+} from 'lucide-react';
 import { 
   Tabs, 
   TabsContent, 
@@ -12,92 +110,83 @@ import {
 } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import BASE_URL from '@/utils/baseUrl';
 
-// Import packages data
-import { packages } from '@/data/packages';
+interface Package {
+  _id: string;
+  packageName: string;
+  packageType: string;
+  destinations: { city?: string; region?: string; country?: string; name?: string }[];
+  duration: { days: number; nights: number };
+  price: { amount: number; currency: string };
+  images: { image: string };
+  shortDescription: string;
+  rating?: number;
+  reviews?: number;
+  groupSize?: number;
+}
 
 const PackageDetailsPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const [packageData, setPackageData] = useState(packages.find(pkg => pkg.id === Number(id)));
-  const { toast } = useToast();
+    const navigate = useNavigate();
+    const { packageId } = useParams<{ packageId: string }>();
+  const [pkg, setPkg] = useState<Package | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [travelers, setTravelers] = useState(2);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Scroll to top when component mounts
-    window.scrollTo(0, 0);
-    
-    // Set package data based on ID from URL
-    const pkg = packages.find(p => p.id === Number(id));
-    setPackageData(pkg);
-    
-  }, [id]);
+    const fetchPackage = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${BASE_URL}/api/packages/${packageId}`);
+        setPkg(response.data);
+      } catch (err) {
+        setError('Failed to load package details.');
+        console.error('Error fetching package:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (!packageData) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="flex-grow flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-2">Package Not Found</h2>
-            <p className="text-gray-600 mb-6">The package you're looking for doesn't exist or has been removed.</p>
-            <Link 
-              to="/packages"
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition"
-            >
-              Browse All Packages
-            </Link>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+    if (packageId) {
+      fetchPackage();
+      window.scrollTo(0, 0);
+    }
+  }, [packageId]);
+    
+//   console.log('packageId:', packageId);
+// console.log('packages:', packages);
 
   const handleBookNow = () => {
-    if (!selectedDate) {
-      toast({
-        title: "Please select a date",
-        description: "You need to select a travel date to proceed with booking.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    toast({
-      title: "Booking successful!",
-      description: `Your trip to ${packageData.name} has been booked for ${selectedDate}.`,
-    });
+    navigate(`/booking/${pkg._id}`);
   };
 
-  type PackageData = {
-    id: string;
-    name: string;
-    description: string;
-    // Add other fields as needed
-  };
-  
   const handleAddToWishlist = () => {
-    const storedWishlist: PackageData[] = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    const isAlreadyInWishlist = storedWishlist.some(item => item.id === packageData.id);
+    if (!pkg) return;
+    
+    const storedWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    const isAlreadyInWishlist = storedWishlist.some((item: Package) => item._id === pkg._id);
   
     if (!isAlreadyInWishlist) {
-      const updatedWishlist = [...storedWishlist, packageData];
+      const updatedWishlist = [...storedWishlist, pkg];
       localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
       toast({
         title: "Added to wishlist",
-        description: `${packageData.name} has been added to your wishlist.`,
+        description: `${pkg.packageName} has been added to your wishlist.`,
       });
     } else {
       toast({
         title: "Already in wishlist",
-        description: `${packageData.name} is already in your wishlist.`,
+        description: `${pkg.packageName} is already in your wishlist.`,
       });
     }
   };
-  
 
-  // Available dates for this package
+  // Sample data for UI elements
   const availableDates = [
     "June 15, 2023",
     "July 10, 2023",
@@ -106,7 +195,6 @@ const PackageDetailsPage = () => {
     "October 12, 2023"
   ];
 
-  // Included amenities
   const included = [
     "Accommodation in 4-star hotels",
     "Daily breakfast and selected meals",
@@ -116,7 +204,6 @@ const PackageDetailsPage = () => {
     "Transportation between destinations"
   ];
   
-  // Not included items
   const notIncluded = [
     "International flights",
     "Travel insurance",
@@ -125,7 +212,6 @@ const PackageDetailsPage = () => {
     "Tips for guides and drivers"
   ];
 
-  // Itinerary data
   const itinerary = [
     {
       day: 1,
@@ -154,6 +240,41 @@ const PackageDetailsPage = () => {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-2">Loading Package Details...</h2>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !pkg) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-2">Package Not Found</h2>
+            <p className="text-gray-600 mb-6">The package you're looking for doesn't exist or has been removed.</p>
+            <Link 
+              to="/packages"
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition"
+            >
+              Browse All Packages
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+}
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -161,29 +282,29 @@ const PackageDetailsPage = () => {
         {/* Hero section with package image */}
         <div className="relative h-[50vh] md:h-[60vh]">
           <img 
-            src={packageData.image} 
-            alt={packageData.name} 
+            src={pkg.images.image} 
+            alt={pkg.packageName} 
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/30 flex items-end">
             <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-12">
               <div className="inline-block bg-secondary/90 text-white text-sm font-semibold px-4 py-1 rounded-full mb-4">
-                Featured Package
+                {pkg.packageType} Package
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{packageData.name}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{pkg.packageName}</h1>
               <div className="flex items-center space-x-6 text-white">
                 <div className="flex items-center">
                   <MapPin className="h-5 w-5 mr-2" />
-                  {packageData.location}
+                  {pkg.destinations[0]?.city || pkg.destinations[0]?.name}
                 </div>
                 <div className="flex items-center">
                   <Clock className="h-5 w-5 mr-2" />
-                  {packageData.duration}
+                  {pkg.duration.days} Days / {pkg.duration.nights} Nights
                 </div>
                 <div className="flex items-center">
                   <Star className="h-5 w-5 mr-2 text-yellow-400 fill-yellow-400" />
-                  <span className="font-semibold">{packageData.rating}</span>
-                  <span className="ml-1">({packageData.reviews} reviews)</span>
+                  <span className="font-semibold">{pkg.rating || 4.8}</span>
+                  <span className="ml-1">({pkg.reviews || 24} reviews)</span>
                 </div>
               </div>
             </div>
@@ -208,8 +329,7 @@ const PackageDetailsPage = () => {
                   <div className="bg-white rounded-xl shadow-md p-6 mb-8">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">Tour Overview</h2>
                     <p className="text-gray-600 mb-6">
-                      {packageData.description}
-                      {/* Extended description for detail page */}
+                      {pkg.shortDescription}
                       {" "}This carefully curated tour offers the perfect blend of cultural immersion, 
                       natural beauty, and leisure time. Whether you're seeking adventure, relaxation, 
                       or a deeper understanding of local cultures, this package provides an unforgettable 
@@ -236,7 +356,7 @@ const PackageDetailsPage = () => {
                       </li>
                       <li className="flex items-start">
                         <CheckCircle className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" />
-                        <span>Small group experience (max {packageData.groupSize})</span>
+                        <span>Small group experience (max {pkg.groupSize || 12})</span>
                       </li>
                       <li className="flex items-start">
                         <CheckCircle className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" />
@@ -341,8 +461,8 @@ const PackageDetailsPage = () => {
                       <h2 className="text-2xl font-bold text-gray-900">Customer Reviews</h2>
                       <div className="flex items-center">
                         <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                        <span className="ml-1 font-semibold">{packageData.rating}</span>
-                        <span className="ml-1 text-gray-600">({packageData.reviews} reviews)</span>
+                        <span className="ml-1 font-semibold">{pkg.rating || 4.8}</span>
+                        <span className="ml-1 text-gray-600">({pkg.reviews || 24} reviews)</span>
                       </div>
                     </div>
                     
@@ -409,158 +529,53 @@ const PackageDetailsPage = () => {
                           The destinations were fantastic and most of the arrangements were smooth. I would have appreciated more free time at certain locations and the hotel on the third night was not as good as the others. Overall, still a great experience.
                         </p>
                       </div>
-                      
-                      <div>
-                        <div className="flex justify-between mb-2">
-                          <div className="flex items-center">
-                            <img 
-                              src="https://randomuser.me/api/portraits/women/45.jpg" 
-                              alt="Reviewer" 
-                              className="w-10 h-10 rounded-full mr-3"
-                            />
-                            <div>
-                              <h4 className="font-semibold">Emma Davis</h4>
-                              <p className="text-xs text-gray-500">Traveled February 2023</p>
-                            </div>
-                          </div>
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star 
-                                key={i} 
-                                className="w-4 h-4 text-yellow-400 fill-yellow-400" 
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <h5 className="font-medium mb-1">Perfect in every way!</h5>
-                        <p className="text-gray-600 text-sm">
-                          I cannot say enough good things about this tour. From start to finish, everything was perfectly organized. The guides were exceptional, the accommodations were lovely, and the experiences were unforgettable. I'm already planning my next trip!
-                        </p>
-                      </div>
                     </div>
                     
                     <Button variant="outline" className="w-full mt-6">
-                      View All {packageData.reviews} Reviews
+                      View All {pkg.reviews || 24} Reviews
                     </Button>
                   </div>
                 </TabsContent>
               </Tabs>
             </div>
             
-            {/* Booking sidebar - 1/3 width */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-md p-6 sticky top-24">
-                <div className="text-3xl font-bold text-primary mb-2">${packageData.price}</div>
-                <p className="text-gray-500 text-sm mb-6">per person</p>
-                
-                <div className="space-y-4 mb-6">
-                  <div>
-                    <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-                      Select Travel Date
-                    </label>
-                    <select
-                      id="date"
-                      className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary focus:ring-primary py-2 px-3"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                    >
-                      <option value="">Select a date</option>
-                      {availableDates.map((date, index) => (
-                        <option key={index} value={date}>{date}</option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="travelers" className="block text-sm font-medium text-gray-700 mb-1">
-                      Number of Travelers
-                    </label>
-                    <select
-                      id="travelers"
-                      className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary focus:ring-primary py-2 px-3"
-                      value={travelers}
-                      onChange={(e) => setTravelers(Number(e.target.value))}
-                    >
-                      {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                        <option key={num} value={num}>{num} {num === 1 ? 'Traveler' : 'Travelers'}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                
-                <div className="border-t border-b border-gray-200 py-4 mb-6">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">Base price:</span>
-                    <span>${packageData.price}</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">Travelers:</span>
-                    <span>x {travelers}</span>
-                  </div>
-                  <div className="flex justify-between font-semibold text-lg">
-                    <span>Total:</span>
-                    <span>${packageData.price * travelers}</span>
-                  </div>
-                </div>
-                
-                <Button className="w-full mb-3 py-6" onClick={handleBookNow}>
-                  Book Now
-                </Button>
-                
-                <Button variant="outline" className="w-full flex items-center justify-center" onClick={handleAddToWishlist}>
-                  <Heart className="mr-2 h-5 w-5" />
-                  Add to Wishlist
-                </Button>
-                
-                <div className="mt-6">
-                  <div className="flex items-start space-x-2 text-sm text-gray-600">
-                    <Calendar className="h-5 w-5 text-gray-400 flex-shrink-0" />
-                    <p>Free cancellation up to 30 days before departure</p>
-                  </div>
-                  <div className="flex items-start space-x-2 text-sm text-gray-600 mt-2">
-                    <User className="h-5 w-5 text-gray-400 flex-shrink-0" />
-                    <p>Small group experience with maximum {packageData.groupSize}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Similar packages section */}
-        <div className="bg-gray-50 py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">You May Also Like</h2>
+ {/* Right Column - Package Overview */}
+<div className="lg:col-span-1">
+  <div className="bg-white rounded-xl shadow-md p-6 sticky top-24 min-h-[500px] flex flex-col justify-between">
+    <div>
+      <h2 className="text-xl font-semibold text-emerald-700 mb-2">Package Overview</h2>
+      <p className="text-sm text-gray-600 mb-4">
+        Discover the beauty of this destination with our expertly curated itinerary, comfortable stays, and immersive local experiences. Perfect for solo travelers, couples, or families.
+      </p>
+
+      <hr className="my-4" />
+
+      <div className="text-sm text-gray-700 space-y-2">
+        <p><span className="font-semibold">Duration:</span> {pkg.duration.days} Days</p>
+        <p><span className="font-semibold">Group Size:</span> Up to {pkg.groupSize || 12} travelers</p>
+        <p><span className="font-semibold">Destinations:</span> {pkg.destinations.map(dest => dest.city).join(', ')}</p>
+        <p><span className="font-semibold">Price:</span> {pkg.price.currency}{pkg.price.amount} per person</p>
+      </div>
+    </div>
+
+    <div className="mt-6 space-y-4">
+      <button
+        onClick={handleAddToWishlist}
+        className="w-full bg-white border border-emerald-600 text-emerald-600 font-medium py-3 rounded-md hover:bg-emerald-50 transition"
+      >
+        ♥ Add to Wishlist
+      </button>
+
+      <button
+        onClick={handleBookNow}
+        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-md transition"
+      >
+        Continue to Booking
+      </button>
+    </div>
+  </div>
+</div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {packages.filter(pkg => pkg.id !== packageData.id).slice(0, 3).map((pkg) => (
-                <div key={pkg.id} className="bg-white rounded-xl shadow-md overflow-hidden card-hover">
-                  <div className="relative">
-                    <img 
-                      src={pkg.image} 
-                      alt={pkg.name} 
-                      className="h-48 w-full object-cover"
-                    />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">{pkg.name}</h3>
-                    <div className="flex items-center text-sm text-gray-600 mb-3">
-                      <MapPin className="h-4 w-4 mr-1 text-primary" />
-                      {pkg.location}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="font-bold text-primary">${pkg.price}</div>
-                      <Link 
-                        to={`/package/${pkg.id}`}
-                        className="text-secondary hover:text-secondary/80 font-medium text-sm"
-                      >
-                        View Details
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </main>
