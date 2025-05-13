@@ -241,7 +241,7 @@ const AllDestinations = () => {
             >
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Domestic</h2>
               <p className="text-gray-600 mb-4">Explore the wonders within our borders</p>
-              <span className="text-purple-600 group-hover:text-purple-800 transition-colors">
+              <span className="text-orange-400 group-hover:text-orange-600 transition-colors">
                 View Destinations →
               </span>
             </button>
@@ -252,7 +252,7 @@ const AllDestinations = () => {
             >
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">International</h2>
               <p className="text-gray-600 mb-4">Discover amazing places around the world</p>
-              <span className="text-purple-600 group-hover:text-purple-800 transition-colors">
+              <span className="text-orange-400 group-hover:text-orange-600 transition-colors">
                 View Destinations →
               </span>
             </button>
@@ -260,7 +260,7 @@ const AllDestinations = () => {
 
           <button
             onClick={() => navigate('/')}
-            className="mt-10 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            className="mt-10 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
             ← Back to Home
           </button>

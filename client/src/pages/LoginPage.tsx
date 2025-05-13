@@ -7,6 +7,7 @@ import { LogIn, Mail, Lock } from 'lucide-react';
 import axios from 'axios';
 import BASE_URL from "../utils/baseUrl";
 import { toast } from 'sonner';
+import { authService } from '@/service/authService';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -31,12 +32,14 @@ const handleSubmit = async (e: React.FormEvent) => {
   setIsLoading(true);
 
   try {
-    const endpoint =
+    const parentKey =
       role === 'admin'
-        ? `${BASE_URL}/auth/admin/login`
-        : `${BASE_URL}/auth/login`;
+        ?'admin/login'
+        : 'login';
 
-    const res = await axios.post(endpoint, formData);
+    // const res = await axios.post(endpoint, formData);
+
+    const res = await authService.create(parentKey, formData);
 
     const { token, user } = res.data;
     console.log('Login response:', res);
