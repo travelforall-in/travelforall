@@ -9,7 +9,7 @@ const {
   deletePackage,
   addReview,
   getFeaturedPackages,
-  getPackagesByType,
+  getPackagesByType, 
   searchPackages,
   getMostPopularPackages,
   createCustomPackage,   // New function
@@ -45,7 +45,7 @@ router.delete('/wishlist/:id', removeFromWishlist);  // Remove from wishlist
 router.post(
   '/',
   authorize('admin'),
-  upload.array('images', 5),
+  upload.array('images', 1),
   validate(packageValidation),
   createPackage
 );
