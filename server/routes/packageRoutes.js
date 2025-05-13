@@ -16,7 +16,9 @@ const {
   addToWishlist,
   getWishlist,
   removeFromWishlist,
-  getPackagesByCity    // Add the new function
+  getPackagesByCity,
+  getDomesticCities,        // New function
+  getInternationalCountries // New function
 } = require('../controllers/packageController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { validate, packageValidation, customPackageValidation } = require('../utils/validation');
@@ -27,8 +29,10 @@ router.get('/', getPackages);
 router.get('/featured', getFeaturedPackages);
 router.get('/popular', getMostPopularPackages);
 router.get('/type/:type', getPackagesByType);
-router.get('/search', searchPackages);  // Improved search function
-router.get('/city/:cityName', getPackagesByCity);  // New route for city-based search
+router.get('/search', searchPackages);
+router.get('/cities/domestic', getDomesticCities);  // New route for domestic cities
+router.get('/countries/international', getInternationalCountries);  // New route for international countries
+router.get('/city/:cityName', getPackagesByCity);
 router.get('/:id', getPackage);
 router.get('/custom/:id', getCustomPackage);
 
