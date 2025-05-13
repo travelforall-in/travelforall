@@ -1,3 +1,4 @@
+//packageController.js
 const Package = require('../models/Package');
 const fs = require('fs');
 const path = require('path');
@@ -439,24 +440,32 @@ exports.getPackagesByType = async (req, res) => {
   }
 };
 
-// @desc    Search packages
+// @desc    Search packages by name, city, or type
 // @route   GET /api/packages/search
 // @access  Public
 exports.searchPackages = async (req, res) => {
   try {
-    const { keyword, minPrice, maxPrice, type, duration } = req.query;
+    const { keyword, type, minPrice, maxPrice, duration, city } = req.query;
     
     const query = {};
     
-    // Search by keyword in name or destination
-    if (keyword) {
+    // Search by city if provided
+    if (city) {
+      query.destination = { $regex: city, $options: 'i' };
+    }
+    
+    // Search by keyword in name or destination if no specific city
+    if (keyword && !city) {
       query.$or = [
         { name: { $regex: keyword, $options: 'i' } },
         { destination: { $regex: keyword, $options: 'i' } },
       ];
+    } else if (keyword) {
+      // If city is specified, only search by name
+      query.name = { $regex: keyword, $options: 'i' };
     }
     
-    // Filter by type
+    // Exact match for package type
     if (type) {
       query.type = type;
     }
@@ -813,6 +822,33 @@ exports.getPackage = async (req, res) => {
     });
   } catch (error) {
     console.error('Get Package Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get packages by city
+// @route   GET /api/packages/city/:cityName
+// @access  Public
+exports.getPackagesByCity = async (req, res) => {
+  try {
+    const { cityName } = req.params;
+    
+    // Find packages that have this city as destination
+    const packages = await Package.find({
+      destination: { $regex: new RegExp(cityName, 'i') }
+    });
+    
+    res.status(200).json({
+      success: true,
+      count: packages.length,
+      data: packages,
+    });
+  } catch (error) {
+    console.error('Get Packages by City Error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',
