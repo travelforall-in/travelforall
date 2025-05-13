@@ -21,6 +21,7 @@ app.get("/",(req,res)=>{
 
 // Routes
 app.use('/', authRoutes);
+
 app.use('/', packageRoutes);
 app.use('/', districtRoutes);
 // app.use('/api/packages', packageRoutes);

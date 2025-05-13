@@ -14,7 +14,7 @@
         "bcryptjs": "^3.0.2",
         "cors": "^2.8.5",
         "dotenv": "^16.3.1",
-        "express": "^4.19.2",
+        "express": "^4.21.2",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.13.2",
         "nodemailer": "^6.10.0",
