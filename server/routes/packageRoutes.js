@@ -1,4 +1,3 @@
-// packageRoutes.js (updated)
 const express = require('express');
 const router = express.Router();
 const {
@@ -12,11 +11,12 @@ const {
   getPackagesByType, 
   searchPackages,
   getMostPopularPackages,
-  createCustomPackage,   // New function
-  getCustomPackage,      // New function
-  addToWishlist,         // New function
-  getWishlist,           // New function
-  removeFromWishlist     // New function
+  createCustomPackage,
+  getCustomPackage,
+  addToWishlist,
+  getWishlist,
+  removeFromWishlist,
+  getPackagesByCity    // Add the new function
 } = require('../controllers/packageController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { validate, packageValidation, customPackageValidation } = require('../utils/validation');
@@ -27,25 +27,26 @@ router.get('/', getPackages);
 router.get('/featured', getFeaturedPackages);
 router.get('/popular', getMostPopularPackages);
 router.get('/type/:type', getPackagesByType);
-router.get('/search', searchPackages);
+router.get('/search', searchPackages);  // Improved search function
+router.get('/city/:cityName', getPackagesByCity);  // New route for city-based search
 router.get('/:id', getPackage);
-router.get('/custom/:id', getCustomPackage);  // Custom package details
+router.get('/custom/:id', getCustomPackage);
 
 // Protected routes
 router.use(protect);
 
 // User routes
 router.post('/:id/reviews', addReview);
-router.post('/custom', validate(customPackageValidation), createCustomPackage);  // Create custom package
-router.post('/wishlist/:id', addToWishlist);  // Add to wishlist
-router.get('/wishlist', getWishlist);  // Get user's wishlist
-router.delete('/wishlist/:id', removeFromWishlist);  // Remove from wishlist
+router.post('/custom', validate(customPackageValidation), createCustomPackage);
+router.post('/wishlist/:id', addToWishlist);
+router.get('/wishlist', getWishlist);
+router.delete('/wishlist/:id', removeFromWishlist);
 
 // Admin only routes with file upload middleware
 router.post(
   '/',
   authorize('admin'),
-  upload.array('images', 1),
+  upload.array('images', 5),
   validate(packageValidation),
   createPackage
 );
