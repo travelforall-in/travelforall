@@ -1,5 +1,4 @@
-// config/db.js
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
