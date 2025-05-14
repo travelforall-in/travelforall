@@ -225,13 +225,12 @@ const Navbar: React.FC = () => {
             {user ? (
 
               <DropdownMenu>
-
-                 <DropdownMenuTrigger asChild>
-    <Button className="rounded-full bg-primary text-white w-9 h-9 p-0 text-sm font-bold uppercase" variant="ghost">
-      {user && user.name ? user.name.charAt(0) : 'X'}  {/* Default fallback 'A' */}
-    </Button>
-  </DropdownMenuTrigger>
-
+                <DropdownMenuTrigger asChild>
+                  <Button className="rounded-full bg-primary text-white w-9 h-9 p-0 text-sm font-bold uppercase" variant="ghost">
+                    {user?.firstName?.charAt(0) || "U"}
+                  
+                  </Button>
+                </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 mt-2">
                   <DropdownMenuItem onClick={() => navigate("/account")}>Account</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/my-packages")}>My Packages</DropdownMenuItem>
