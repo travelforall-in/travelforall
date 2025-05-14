@@ -856,3 +856,65 @@ exports.getPackagesByCity = async (req, res) => {
     });
   }
 };
+
+// @desc    Get all domestic city names
+// @route   GET /api/packages/cities/domestic
+// @access  Public
+exports.getDomesticCities = async (req, res) => {
+  try {
+    // Find all domestic packages and extract unique city names
+    const domesticPackages = await Package.find({ type: 'domestic' })
+      .select('destination')
+      .lean();
+    
+    // Extract and deduplicate city names
+    const cityNames = [...new Set(domesticPackages.map(pkg => pkg.destination))];
+    
+    // Sort alphabetically
+    cityNames.sort();
+    
+    res.status(200).json({
+      success: true,
+      count: cityNames.length,
+      data: cityNames,
+    });
+  } catch (error) {
+    console.error('Get Domestic Cities Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get all international country names
+// @route   GET /api/packages/countries/international
+// @access  Public
+exports.getInternationalCountries = async (req, res) => {
+  try {
+    // Find all international packages and extract unique country names
+    const internationalPackages = await Package.find({ type: 'international' })
+      .select('destination')
+      .lean();
+    
+    // Extract and deduplicate country names
+    const countryNames = [...new Set(internationalPackages.map(pkg => pkg.destination))];
+    
+    // Sort alphabetically
+    countryNames.sort();
+    
+    res.status(200).json({
+      success: true,
+      count: countryNames.length,
+      data: countryNames,
+    });
+  } catch (error) {
+    console.error('Get International Countries Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
