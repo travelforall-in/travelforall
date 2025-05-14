@@ -26,12 +26,14 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-      <>
+    <>
       <Navbar />
       <div className="pt-16 flex flex-grow">
         {/* Sidebar */}
         <aside className="w-64 bg-white p-6 shadow-md">
-          <h2 className="text-xl font-semibold mb-6 text-primary">Admin Panel</h2>
+          <h2 className="text-xl font-semibold mb-6 text-primary">
+            Admin Panel
+          </h2>
           <nav className="space-y-4">
             <button className="flex items-center gap-2 text-gray-700 hover:text-primary">
               <Users className="w-5 h-5" />
@@ -45,15 +47,22 @@ const AdminDashboard: React.FC = () => {
               <Settings className="w-5 h-5" />
               Settings
             </button>
-          
-          <button className="flex items-center gap-2 text-gray-700 hover:text-primary">
+
+            <button
+              className="flex items-center gap-2 text-gray-700 hover:text-primary"
+              onClick={() => navigate("/admin/create-package")}
+            >
               <Settings className="w-5 h-5" />
               Create Package
             </button>
           </nav>
 
           <div className="mt-10">
-            <Button onClick={handleLogout} variant="destructive" className="w-full">
+            <Button
+              onClick={handleLogout}
+              variant="destructive"
+              className="w-full"
+            >
               <LogOut className="mr-2 h-5 w-5" />
               Logout
             </Button>
@@ -84,8 +93,8 @@ const AdminDashboard: React.FC = () => {
           </div>
         </main>
       </div>
-      <Footer /></>
-   
+      <Footer />
+    </>
   );
 };
 
