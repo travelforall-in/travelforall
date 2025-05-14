@@ -13,6 +13,8 @@ const config = require('../config/config');
 // @access  Public
 exports.registerUser = async (req, res) => {
   try {
+    // console.log("Registering user with data:", req.body);
+
     const { name, email, password, phone } = req.body;
 
     // Check if user already exists
@@ -218,3 +220,5 @@ exports.logout = async (req, res) => {
     });
   }
 };
+
+

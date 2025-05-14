@@ -1,19 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { getHomePath } from '../utils/getHomePath'; // adjust the path if needed
+import { getHomePath } from '../utils/getHomePath'; // adjust if needed
 
-const ContactUs = () => {
-  const [formData, setFormData] = useState({
+interface FormData {
+  name: string;
+  email: string;
+  message: string;
+}
+
+const ContactUs: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     message: '',
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     console.log(formData);
     alert('Message sent! We will get back to you shortly.');
@@ -21,63 +27,63 @@ const ContactUs = () => {
   };
 
   return (
-    <section className="bg-white py-16">
+    <section className="bg-background py-16 text-foreground font-sans">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-6">Contact Us</h1>
+        <h1 className="text-4xl font-bold text-secondary mb-6">Contact Us</h1>
         <p className="text-gray-600 mb-10">
           We'd love to hear from you! Whether you have a question about a destination, need help planning, or just want to say hello, our team is here to assist.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Contact Info */}
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Office</h2>
-            <p className="text-gray-600 mb-2">📍 Pune, Maharashtra, India</p>
-            <p className="text-gray-600 mb-2">📧 support@travelforall.com</p>
-            <p className="text-gray-600 mb-2">📞 +91 98765 43210</p>
+          <div className="border-l-4 border-secondary pl-4">
+            <h2 className="text-2xl font-semibold text-secondary mb-4">Our Office</h2>
+            <p className="mb-2">📍 Pune, Maharashtra, India</p>
+            <p className="mb-2">📧 support@travelforall.com</p>
+            <p className="mb-2">📞 +91 98765 43210</p>
 
-            <h3 className="text-xl font-semibold text-gray-800 mt-6 mb-2">Working Hours</h3>
-            <p className="text-gray-600">Monday to Saturday: 9 AM - 6 PM</p>
+            <h3 className="text-xl font-semibold text-primary mt-6 mb-2">Working Hours</h3>
+            <p>Monday to Saturday: 9 AM - 6 PM</p>
           </div>
 
           {/* Contact Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Name</label>
+              <label className="block font-medium mb-1 text-primary">Name</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-secondary"
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Email</label>
+              <label className="block font-medium mb-1 text-primary">Email</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-secondary"
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Message</label>
+              <label className="block font-medium mb-1 text-primary">Message</label>
               <textarea
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
                 required
-                rows="5"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={5}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-secondary"
               ></textarea>
             </div>
             <button
               type="submit"
-              className="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700"
+              className="bg-secondary text-secondary-foreground font-semibold px-6 py-2 rounded-lg hover:bg-primary hover:text-white transition-all"
             >
               Send Message
             </button>
@@ -88,7 +94,7 @@ const ContactUs = () => {
         <div className="mt-12">
           <Link
             to={getHomePath()}
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg shadow"
+            className="inline-block bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg shadow transition-all"
           >
             Back to Home
           </Link>
