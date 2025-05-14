@@ -72,16 +72,17 @@ const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || 'localhost';
 
 const server = app.listen(PORT, () => {
-  console.log(`Server running on ${HOST}:${PORT}`);
+console.log(`Server running on ${HOST}:${PORT}`);
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
-  console.error(`Unhandled Rejection: ${err.message}`);
+console.error(`Unhandled Rejection: ${err.message}`);
   // Close server & exit process
   server.close(() => process.exit(1));
 });
 
+// Handle uncaught exceptions
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.error(`Uncaught Exception: ${err.message}`);
@@ -89,4 +90,5 @@ process.on('uncaughtException', (err) => {
   server.close(() => process.exit(1));
 });
 
-module.exports = app;
+
+module.exports = app;
