@@ -918,3 +918,320 @@ exports.getInternationalCountries = async (req, res) => {
     });
   }
 };
+
+// Updated functions in packageController.js to work with cities
+
+// @desc    Create new package
+// @route   POST /api/packages
+// @access  Private/Admin
+exports.createPackage = async (req, res) => {
+  try {
+    // Handle multiple image uploads
+    const imageFiles = req.files;
+    
+    // Prepare package data
+    const packageData = { ...req.body };
+
+    // If images were uploaded, add their paths to the package
+    if (imageFiles && imageFiles.length > 0) {
+      packageData.images = imageFiles.map(file => `/uploads/packages/${file.filename}`);
+    }
+
+    // Parse JSON-like string fields
+    const fieldsToParseAsJSON = [
+      'highlights', 
+      'inclusions', 
+      'exclusions', 
+      'itinerary'
+    ];
+
+    fieldsToParseAsJSON.forEach(field => {
+      if (packageData[field] && typeof packageData[field] === 'string') {
+        try {
+          packageData[field] = JSON.parse(packageData[field]);
+        } catch (error) {
+          console.warn(`Could not parse ${field}:`, packageData[field]);
+        }
+      }
+    });
+
+    // Handle nested duration
+    if (packageData['duration.days'] || packageData['duration.nights']) {
+      packageData.duration = {
+        days: parseInt(packageData['duration.days']),
+        nights: parseInt(packageData['duration.nights'])
+      };
+    }
+
+    // Convert primitive fields
+    if (packageData.price) packageData.price = parseFloat(packageData.price);
+    packageData.featured = packageData.featured === 'true';
+
+    // Validate city exists
+    if (packageData.city) {
+      const City = require('../models/City');
+      const cityExists = await City.findById(packageData.city);
+      
+      if (!cityExists) {
+        return res.status(404).json({
+          success: false,
+          message: 'City not found with the provided ID',
+        });
+      }
+      
+      // If destination is not provided but city is, use city name as destination
+      if (!packageData.destination) {
+        packageData.destination = cityExists.name;
+      }
+      
+      // If type is not provided, use city type
+      if (!packageData.type) {
+        packageData.type = cityExists.type;
+      }
+    }
+
+    // Create package
+    const newPackage = await Package.create(packageData);
+    
+    // Populate city information for the response
+    await newPackage.populate('city');
+    
+    res.status(201).json({
+      success: true,
+      data: newPackage,
+    });
+  } catch (error) {
+    console.error('Error creating package:', error);
+    
+    // Clean up uploaded files if package creation fails
+    if (req.files) {
+      req.files.forEach(file => {
+        const filePath = path.join(__dirname, '../uploads/packages', file.filename);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get single package
+// @route   GET /api/packages/:id
+// @access  Public
+exports.getPackage = async (req, res) => {
+  try {
+    const packageId = req.params.id;
+    
+    // Validate package ID (extra safeguard)
+    if (!mongoose.Types.ObjectId.isValid(packageId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid package ID format'
+      });
+    }
+    
+    // Fetch package with city information
+    const package = await Package.findById(packageId)
+      .populate('city');
+    
+    if (!package) {
+      return res.status(404).json({
+        success: false,
+        message: 'Package not found'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: package
+    });
+  } catch (error) {
+    console.error('Get Package Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get all packages
+// @route   GET /api/packages
+// @access  Public
+exports.getPackages = async (req, res) => {
+  try {
+    const query = {};
+    
+    // Filter by type if provided
+    if (req.query.type) {
+      query.type = req.query.type;
+    }
+    
+    // Filter by price range if provided
+    if (req.query.minPrice && req.query.maxPrice) {
+      query.price = { 
+        $gte: parseFloat(req.query.minPrice), 
+        $lte: parseFloat(req.query.maxPrice) 
+      };
+    } else if (req.query.minPrice) {
+      query.price = { $gte: parseFloat(req.query.minPrice) };
+    } else if (req.query.maxPrice) {
+      query.price = { $lte: parseFloat(req.query.maxPrice) };
+    }
+    
+    // Filter by destination if provided
+    if (req.query.destination) {
+      query.destination = { $regex: req.query.destination, $options: 'i' };
+    }
+    
+    // Filter by city if provided
+    if (req.query.city) {
+      query.city = req.query.city;
+    }
+    
+    // Filter by duration if provided
+    if (req.query.duration) {
+      query['duration.days'] = { $lte: parseInt(req.query.duration) };
+    }
+    
+    // Sorting
+    const sortOptions = req.query.sort 
+      ? req.query.sort.split(',').join(' ')
+      : '-createdAt';
+    
+    // Pagination
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    
+    // Execute query with city population
+    const total = await Package.countDocuments(query);
+    const packages = await Package.find(query)
+      .populate('city', 'name country type')
+      .sort(sortOptions)
+      .skip(startIndex)
+      .limit(limit);
+    
+    // Pagination result
+    const pagination = {};
+    
+    if (endIndex < total) {
+      pagination.next = {
+        page: page + 1,
+        limit,
+      };
+    }
+    
+    if (startIndex > 0) {
+      pagination.prev = {
+        page: page - 1,
+        limit,
+      };
+    }
+    
+    res.status(200).json({
+      success: true,
+      count: packages.length,
+      total,
+      pagination,
+      data: packages,
+    });
+  } catch (error) {
+    console.error('Get Packages Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Search packages by name, city, or type
+// @route   GET /api/packages/search
+// @access  Public
+exports.searchPackages = async (req, res) => {
+  try {
+    const { keyword, type, minPrice, maxPrice, duration, city, cityId } = req.query;
+    
+    const query = {};
+    
+    // Search by city ID if provided
+    if (cityId) {
+      query.city = cityId;
+    }
+    
+    // Search by city name if provided and not searching by city ID
+    if (city && !cityId) {
+      // First, find cities that match the name
+      const City = require('../models/City');
+      const cities = await City.find({
+        name: { $regex: city, $options: 'i' }
+      }).select('_id');
+      
+      if (cities.length > 0) {
+        // If cities found, search packages with those city IDs
+        query.city = { $in: cities.map(c => c._id) };
+      } else {
+        // If no cities found, search in destination field as fallback
+        query.destination = { $regex: city, $options: 'i' };
+      }
+    }
+    
+    // Search by keyword in name or destination if no specific city
+    if (keyword && !city && !cityId) {
+      query.$or = [
+        { name: { $regex: keyword, $options: 'i' } },
+        { destination: { $regex: keyword, $options: 'i' } },
+      ];
+    } else if (keyword) {
+      // If city is specified, only search by name
+      query.name = { $regex: keyword, $options: 'i' };
+    }
+    
+    // Exact match for package type
+    if (type) {
+      query.type = type;
+    }
+    
+    // Filter by price range
+    if (minPrice && maxPrice) {
+      query.price = { 
+        $gte: parseFloat(minPrice), 
+        $lte: parseFloat(maxPrice) 
+      };
+    } else if (minPrice) {
+      query.price = { $gte: parseFloat(minPrice) };
+    } else if (maxPrice) {
+      query.price = { $lte: parseFloat(maxPrice) };
+    }
+    
+    // Filter by duration
+    if (duration) {
+      query['duration.days'] = { $lte: parseInt(duration) };
+    }
+    
+    const packages = await Package.find(query)
+      .populate('city', 'name country type')
+      .sort('-createdAt');
+    
+    res.status(200).json({
+      success: true,
+      count: packages.length,
+      data: packages,
+    });
+  } catch (error) {
+    console.error('Search Packages Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
