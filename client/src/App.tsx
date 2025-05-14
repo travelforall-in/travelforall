@@ -31,6 +31,9 @@ import ChangePassword from "./pages/ChangePassword";
 import PaymentHistory from "./pages/PaymentHistory";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminCreatePackage from "./pages/AdminCreatePackage";
+import AdminPanel from "./pages/AdminPanel";
+import AdminPackageList from "./pages/AdminPackageList";
+import ManageUsers from "./pages/ManageUsers";
 
 const queryClient = new QueryClient();
 
@@ -59,10 +62,13 @@ const App = () => (
           <Route path="/booking/:packageId" element={<BookingPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/create-package" element={<AdminCreatePackage/>} />
-
-
+          <Route path="/admin/dashboard" element={<AdminPanel />} />
+          <Route path="/admin/manage-users" element={<ManageUsers />} />
+          <Route path="/admin/package-list" element={<AdminPackageList />} />
+          <Route
+            path="/admin/create-package"
+            element={<AdminCreatePackage />}
+          />
 
           {/* Auth-protected routes */}
           <Route element={<ProtectedRoute />}>

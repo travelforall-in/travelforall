@@ -227,7 +227,7 @@ const Navbar: React.FC = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button className="rounded-full bg-primary text-white w-9 h-9 p-0 text-sm font-bold uppercase" variant="ghost">
-                    {user?.firstName?.charAt(0) || "U"}
+                    {user?.name?.charAt(0) || "U"}
                   
                   </Button>
                 </DropdownMenuTrigger>
@@ -264,7 +264,7 @@ const Navbar: React.FC = () => {
           {user ? (
             <>
 <div className="mt-4 px-3 py-2 text-sm font-semibold text-gray-700 uppercase">
-  {user?.firstName?.charAt(0) || 'A'}
+  {user?.name?.charAt(0) || 'A'}
 </div>
               <button onClick={() => navigate("/account")} className="block w-full text-left px-3 py-2 hover:bg-muted rounded">Account</button>
               <button onClick={() => navigate("/my-packages")} className="block w-full text-left px-3 py-2 hover:bg-muted rounded">My Packages</button>
