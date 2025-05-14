@@ -27,6 +27,9 @@ import PaymentPage from "./pages/PaymentPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import Account from "./pages/Account";
 import PackageDetailsPage from "./pages/PackageDetailsPage";
+import AccountSettings from "./pages/AccountSettings";
+import ChangePassword from "./pages/ChangePassword";
+import PaymentHistory from "./pages/PaymentHistory";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +51,9 @@ const App = () => (
           {/* <Route path="/packages" element={<AllPackages />} /> */}
           <Route path="/packages/:packageId" element={<PackageDetailsPage />} />
           <Route path="/account" element={<Account />} />
+           <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/change-password"element={<ChangePassword />} />
+             <Route path="/payment-history"element={<PaymentHistory />} />
           <Route path="/my-packages" element={<MyPackages />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/destinations/:type" element={<Domestic />} />
