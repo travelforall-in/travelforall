@@ -227,7 +227,8 @@ const Navbar: React.FC = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button className="rounded-full bg-primary text-white w-9 h-9 p-0 text-sm font-bold uppercase" variant="ghost">
-                    {user.firstName.charAt(0)}
+                    {user?.firstName?.charAt(0) || "U"}
+                  
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 mt-2">
