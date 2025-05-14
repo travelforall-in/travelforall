@@ -25,7 +25,12 @@ import BookingPage from "./pages/BookingPage";
 import PaymentPage from "./pages/PaymentPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import Account from "./pages/Account";
-import PackageDetailsPage from "./pages/PackageDetailsPage";
+// import PackageDetailsPage from "./pages/PackageDetailsPage";
+import AccountSettings from "./pages/AccountSettings";
+import ChangePassword from "./pages/ChangePassword";
+import PaymentHistory from "./pages/PaymentHistory";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminCreatePackage from "./pages/AdminCreatePackage";
 
 const queryClient = new QueryClient();
 
@@ -55,7 +60,7 @@ const App = () => (
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/create-package" element={<AdminCreatePackage />} />
+          <Route path="/admin/create-package" element={<AdminCreatePackage/>} />
 
 
 
