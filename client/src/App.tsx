@@ -25,8 +25,7 @@ import BookingPage from "./pages/BookingPage";
 import PaymentPage from "./pages/PaymentPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import Account from "./pages/Account";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminCreatePackage from "./pages/AdminCreatePackage";
+import PackageDetailsPage from "./pages/PackageDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +45,9 @@ const App = () => (
           <Route path="/search-results" element={<SearchResultsPage />} />
           {/* <Route path="/packages" element={<AllPackages />} /> */}
           <Route path="/account" element={<Account />} />
+           <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/change-password"element={<ChangePassword />} />
+             <Route path="/payment-history"element={<PaymentHistory />} />
           <Route path="/my-packages" element={<MyPackages />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/destinations/:type" element={<Domestic />} />
