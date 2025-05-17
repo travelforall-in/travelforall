@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -45,6 +46,9 @@ app.use('/api/custom-packages', require('./routes/customPackageRoutes'));
 app.use('/api/wishlist', require('./routes/wishlistRoutes'));
 app.use('/api/admin/custom-packages', require('./routes/adminCustomPackageRoutes'));
 
+// Cities routes
+app.use('/api/cities', require('./routes/cityRoutes'));
+
 // New location, hotel, and transportation routes
 app.use('/api/locations', require('./routes/locationRoutes'));
 app.use('/api/hotels', require('./routes/hotelRoutes'));
@@ -52,7 +56,7 @@ app.use('/api/transportation', require('./routes/transportationRoutes'));
 
 // Home route
 app.get('/', (req, res) => {
-  res.send('Travel Booking API is running with Location, Hotel, Transportation, Custom Package and Wishlist features');
+  res.send('Travel Booking API is running with Cities, Locations, Hotels, Transportation, Custom Package and Wishlist features');
 });
 
 // Catch-all route for frontend routing (uncomment when you have frontend)

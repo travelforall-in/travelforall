@@ -1,4 +1,4 @@
-// utils/validation.js
+// utils/validation.js (Complete updated version)
 const { body, validationResult } = require('express-validator');
 
 // Validation middleware
@@ -20,7 +20,9 @@ exports.validate = (validations) => {
       'bookingInformation',
       'attractions',
       'travelTips',
-      'weather'
+      'weather',
+      'popularAttractions',  // Added for cities
+      'localCuisine'         // Added for cities
     ];
 
     fieldsToParseAsJSON.forEach(field => {
@@ -94,7 +96,7 @@ exports.loginValidation = [
     .withMessage('Password is required')
 ];
 
-// Package validation rules
+// Package validation rules with city support
 exports.packageValidation = [
   body('name')
     .notEmpty()
@@ -113,6 +115,12 @@ exports.packageValidation = [
     .notEmpty()
     .withMessage('Destination is required'),
   
+  body('city')
+    .notEmpty()
+    .withMessage('City ID is required')
+    .isMongoId()
+    .withMessage('City ID must be a valid MongoDB ObjectId'),
+  
   body('duration.days')
     .notEmpty()
     .withMessage('Number of days is required')
@@ -122,8 +130,8 @@ exports.packageValidation = [
   body('duration.nights')
     .notEmpty()
     .withMessage('Number of nights is required')
-    .isInt({ min: 1 })
-    .withMessage('Nights must be a positive number'),
+    .isInt({ min: 0 })
+    .withMessage('Nights must be a non-negative number'),
   
   body('price')
     .notEmpty()
@@ -132,8 +140,18 @@ exports.packageValidation = [
     .withMessage('Price must be a positive number'),
   
   body('highlights')
-    .isArray()
-    .withMessage('Highlights must be an array'),
+    .custom((value) => {
+      if (Array.isArray(value)) {
+        if (value.length < 1) {
+          throw new Error('At least one highlight is required');
+        }
+        return true;
+      } else if (typeof value === 'string') {
+        // Will be parsed to JSON in validate middleware
+        return true;
+      }
+      throw new Error('Highlights must be an array');
+    }),
   
   body('transportation')
     .notEmpty()
@@ -144,6 +162,71 @@ exports.packageValidation = [
   body('accommodation')
     .notEmpty()
     .withMessage('Accommodation is required')
+];
+
+// City validation rules
+exports.cityValidation = [
+  body('name')
+    .notEmpty()
+    .withMessage('City name is required')
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('City name cannot be more than 100 characters'),
+  
+  body('country')
+    .notEmpty()
+    .withMessage('Country name is required')
+    .trim(),
+  
+  body('type')
+    .notEmpty()
+    .withMessage('City type is required')
+    .isIn(['domestic', 'international'])
+    .withMessage('City type must be either domestic or international'),
+  
+  body('description')
+    .notEmpty()
+    .withMessage('Description is required'),
+  
+  body('weather')
+    .notEmpty()
+    .withMessage('Weather information is required'),
+  
+  body('bestTimeToVisit')
+    .notEmpty()
+    .withMessage('Best time to visit is required'),
+  
+  body('popularAttractions')
+    .notEmpty()
+    .withMessage('Popular attractions are required')
+    .custom((value) => {
+      if (Array.isArray(value)) {
+        if (value.length < 1) {
+          throw new Error('At least one popular attraction is required');
+        }
+        return true;
+      } else if (typeof value === 'string') {
+        // Will be parsed to JSON in validate middleware
+        return true;
+      }
+      throw new Error('Popular attractions must be an array');
+    }),
+  
+  body('localCuisine')
+    .optional()
+    .custom((value) => {
+      if (Array.isArray(value) || typeof value === 'string') {
+        return true;
+      }
+      throw new Error('Local cuisine must be an array');
+    }),
+  
+  body('transportation')
+    .notEmpty()
+    .withMessage('Transportation information is required'),
+  
+  body('culturalNotes')
+    .optional()
 ];
 
 // Booking validation rules

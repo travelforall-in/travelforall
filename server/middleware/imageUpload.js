@@ -10,7 +10,8 @@ const createDirectories = () => {
     './uploads/packages',
     './uploads/hotels',
     './uploads/locations',
-    './uploads/transportation'
+    './uploads/transportation',
+    './uploads/cities' // Added new directory for cities
   ];
   
   directories.forEach(dir => {
@@ -36,6 +37,8 @@ const storage = multer.diskStorage({
       uploadPath = './uploads/locations';
     } else if (req.originalUrl.includes('/transportation')) {
       uploadPath = './uploads/transportation';
+    } else if (req.originalUrl.includes('/cities')) {
+      uploadPath = './uploads/cities';
     }
     
     cb(null, uploadPath);
@@ -50,6 +53,8 @@ const storage = multer.diskStorage({
       prefix = 'location';
     } else if (req.originalUrl.includes('/transportation')) {
       prefix = 'transport';
+    } else if (req.originalUrl.includes('/cities')) {
+      prefix = 'city';
     }
     
     // Generate unique filename
