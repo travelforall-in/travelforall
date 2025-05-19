@@ -72,7 +72,7 @@ const Dashboard = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        console.log("Dashboard API response:", res.data);
+        // console.log("Dashboard API response:", res.data);
         const {
           overview = {},
           recentUsers = [],
@@ -102,6 +102,8 @@ const Dashboard = () => {
         onLogout={handleLogout}
         onPackageClick={() => navigate("/admin/package-list")}
         onManageUsersClick={() => navigate("/admin/manage-users")}
+        onDashboardClick={() => navigate("/admin/dashboard")}
+        onDestinationClick={() => navigate("/admin/destination")}
       />
       <div className="flex-1 p-6 bg-gray-50 min-h-screen">
         <header className="flex justify-between items-center mb-6">
@@ -179,7 +181,9 @@ const Dashboard = () => {
                   <h3 className="text-lg font-semibold mb-4">Package Stats</h3>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">Domestic Packages:</span>
+                      <span className="text-sm font-medium">
+                        Domestic Packages:
+                      </span>
                       <span>
                         {dashboardData.packageStats?.domestic?.count ?? 0}
                       </span>
