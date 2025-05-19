@@ -53,6 +53,8 @@ app.use('/api/cities', require('./routes/cityRoutes'));
 app.use('/api/locations', require('./routes/locationRoutes'));
 app.use('/api/hotels', require('./routes/hotelRoutes'));
 app.use('/api/transportation', require('./routes/transportationRoutes'));
+app.use('/api/contact', require('./routes/contactRoutes'));
+
 
 // Home route
 app.get('/', (req, res) => {
