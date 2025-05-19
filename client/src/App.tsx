@@ -34,6 +34,8 @@ import AdminCreatePackage from "./pages/AdminCreatePackage";
 import AdminPanel from "./pages/AdminPanel";
 import AdminPackageList from "./pages/AdminPackageList";
 import ManageUsers from "./pages/ManageUsers";
+import AllPackages from "./pages/AllPackages";
+import AllPackagesPage from "./pages/AllPackagesPage";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +51,7 @@ const App = () => (
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/destinations" element={<AllDestinations />} />
+          <Route path="/all-packages" element={<AllPackagesPage />} />  
           {/* <Route path="/explore-packages" element={<ExplorePackages />} /> */}
           <Route path="/search-results" element={<SearchResultsPage />} />
           {/* <Route path="/packages" element={<AllPackages />} /> */}
@@ -64,6 +67,8 @@ const App = () => (
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/admin/dashboard" element={<AdminPanel />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
+          
+
           <Route path="/admin/package-list" element={<AdminPackageList />} />
           <Route
             path="/admin/create-package"
