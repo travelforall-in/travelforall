@@ -1,23 +1,23 @@
-// controllers/cityController.js
-const City = require('../models/City');
+// controllers/stateController.js
+const State = require('../models/State');
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
 
-// @desc    Create new city
-// @route   POST /api/cities
+// @desc    Create new state
+// @route   POST /api/states
 // @access  Private/Admin
-exports.createCity = async (req, res) => {
+exports.createState = async (req, res) => {
   try {
     // Handle multiple image uploads
     const imageFiles = req.files;
     
-    // Prepare city data
-    const cityData = { ...req.body };
+    // Prepare state data
+    const stateData = { ...req.body };
 
-    // If images were uploaded, add their paths to the city
+    // If images were uploaded, add their paths to the state
     if (imageFiles && imageFiles.length > 0) {
-      cityData.images = imageFiles.map(file => `/uploads/cities/${file.filename}`);
+      stateData.images = imageFiles.map(file => `/uploads/states/${file.filename}`);
     }
 
     // Parse JSON-like string fields
@@ -27,60 +27,29 @@ exports.createCity = async (req, res) => {
     ];
 
     fieldsToParseAsJSON.forEach(field => {
-      if (cityData[field] && typeof cityData[field] === 'string') {
+      if (stateData[field] && typeof stateData[field] === 'string') {
         try {
-          cityData[field] = JSON.parse(cityData[field]);
+          stateData[field] = JSON.parse(stateData[field]);
         } catch (error) {
-          console.warn(`Could not parse ${field}:`, cityData[field]);
+          console.warn(`Could not parse ${field}:`, stateData[field]);
         }
       }
     });
 
-    // Validate state if provided
-    if (cityData.state) {
-      const State = require('../models/State');
-      const stateExists = await State.findById(cityData.state);
-      
-      if (!stateExists) {
-        return res.status(404).json({
-          success: false,
-          message: 'State not found with the provided ID',
-        });
-      }
-      
-      // If type is not provided, use state type
-      if (!cityData.type) {
-        cityData.type = stateExists.type;
-      }
-      
-      // If country is not provided, use state country
-      if (!cityData.country) {
-        cityData.country = stateExists.country;
-      }
-    }
-
-    // Create city
-    const newCity = await City.create(cityData);
-    
-    // If state is provided, add this city to the state's cities array
-    if (cityData.state) {
-      await State.findByIdAndUpdate(
-        cityData.state,
-        { $push: { cities: newCity._id } }
-      );
-    }
+    // Create state
+    const newState = await State.create(stateData);
     
     res.status(201).json({
       success: true,
-      data: newCity,
+      data: newState,
     });
   } catch (error) {
-    console.error('Error creating city:', error);
+    console.error('Error creating state:', error);
     
-    // Clean up uploaded files if city creation fails
+    // Clean up uploaded files if state creation fails
     if (req.files) {
       req.files.forEach(file => {
-        const filePath = path.join(__dirname, '../uploads/cities', file.filename);
+        const filePath = path.join(__dirname, '../uploads/states', file.filename);
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
         }
@@ -95,11 +64,10 @@ exports.createCity = async (req, res) => {
   }
 };
 
-// @desc    Get all cities
-// @route   GET /api/cities
+// @desc    Get all states
+// @route   GET /api/states
 // @access  Public
-// Update getCities to populate state
-exports.getCities = async (req, res) => {
+exports.getStates = async (req, res) => {
   try {
     const query = {};
     
@@ -118,11 +86,6 @@ exports.getCities = async (req, res) => {
       query.name = { $regex: req.query.name, $options: 'i' };
     }
     
-    // Filter by state if provided
-    if (req.query.state) {
-      query.state = req.query.state;
-    }
-    
     // Sorting
     const sortOptions = req.query.sort 
       ? req.query.sort.split(',').join(' ')
@@ -134,10 +97,9 @@ exports.getCities = async (req, res) => {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
     
-    // Execute query with state population
-    const total = await City.countDocuments(query);
-    const cities = await City.find(query)
-      .populate('state', 'name country type')
+    // Execute query
+    const total = await State.countDocuments(query);
+    const states = await State.find(query)
       .sort(sortOptions)
       .skip(startIndex)
       .limit(limit);
@@ -161,13 +123,13 @@ exports.getCities = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      count: cities.length,
+      count: states.length,
       total,
       pagination,
-      data: cities,
+      data: states,
     });
   } catch (error) {
-    console.error('Get Cities Error:', error);
+    console.error('Get States Error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -176,27 +138,26 @@ exports.getCities = async (req, res) => {
   }
 };
 
-// @desc    Get single city
-// @route   GET /api/cities/:id
+// @desc    Get single state
+// @route   GET /api/states/:id
 // @access  Public
-// Update getCity to populate state
-exports.getCity = async (req, res) => {
+exports.getState = async (req, res) => {
   try {
-    const city = await City.findById(req.params.id).populate('state', 'name country type');
+    const state = await State.findById(req.params.id).populate('cities');
     
-    if (!city) {
+    if (!state) {
       return res.status(404).json({
         success: false,
-        message: 'City not found',
+        message: 'State not found',
       });
     }
     
     res.status(200).json({
       success: true,
-      data: city,
+      data: state,
     });
   } catch (error) {
-    console.error('Get City Error:', error);
+    console.error('Get State Error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -204,17 +165,18 @@ exports.getCity = async (req, res) => {
     });
   }
 };
-// @desc    Update city
-// @route   PUT /api/cities/:id
+
+// @desc    Update state
+// @route   PUT /api/states/:id
 // @access  Private/Admin
-exports.updateCity = async (req, res) => {
+exports.updateState = async (req, res) => {
   try {
-    let city = await City.findById(req.params.id);
+    let state = await State.findById(req.params.id);
     
-    if (!city) {
+    if (!state) {
       return res.status(404).json({
         success: false,
-        message: 'City not found',
+        message: 'State not found',
       });
     }
 
@@ -224,11 +186,11 @@ exports.updateCity = async (req, res) => {
     // Handle multiple image uploads
     const imageFiles = req.files;
     
-    // If new images were uploaded, add their paths to the city
+    // If new images were uploaded, add their paths to the state
     if (imageFiles && imageFiles.length > 0) {
       // Remove old image files if they exist
-      if (city.images && city.images.length > 0) {
-        city.images.forEach(imagePath => {
+      if (state.images && state.images.length > 0) {
+        state.images.forEach(imagePath => {
           const fullPath = path.join(__dirname, '../', imagePath);
           if (fs.existsSync(fullPath)) {
             fs.unlinkSync(fullPath);
@@ -237,7 +199,7 @@ exports.updateCity = async (req, res) => {
       }
 
       // Add new image paths
-      updateData.images = imageFiles.map(file => `/uploads/cities/${file.filename}`);
+      updateData.images = imageFiles.map(file => `/uploads/states/${file.filename}`);
     }
 
     // Parse JSON-like string fields
@@ -256,8 +218,8 @@ exports.updateCity = async (req, res) => {
       }
     });
     
-    // Update city
-    city = await City.findByIdAndUpdate(
+    // Update state
+    state = await State.findByIdAndUpdate(
       req.params.id, 
       updateData, 
       {
@@ -268,10 +230,10 @@ exports.updateCity = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      data: city,
+      data: state,
     });
   } catch (error) {
-    console.error('Update City Error:', error);
+    console.error('Update State Error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -280,23 +242,23 @@ exports.updateCity = async (req, res) => {
   }
 };
 
-// @desc    Delete city
-// @route   DELETE /api/cities/:id
+// @desc    Delete state
+// @route   DELETE /api/states/:id
 // @access  Private/Admin
-exports.deleteCity = async (req, res) => {
+exports.deleteState = async (req, res) => {
   try {
-    const city = await City.findById(req.params.id);
+    const state = await State.findById(req.params.id);
     
-    if (!city) {
+    if (!state) {
       return res.status(404).json({
         success: false,
-        message: 'City not found',
+        message: 'State not found',
       });
     }
     
     // Remove associated image files
-    if (city.images && city.images.length > 0) {
-      city.images.forEach(imagePath => {
+    if (state.images && state.images.length > 0) {
+      state.images.forEach(imagePath => {
         const fullPath = path.join(__dirname, '../', imagePath);
         if (fs.existsSync(fullPath)) {
           fs.unlinkSync(fullPath);
@@ -304,15 +266,15 @@ exports.deleteCity = async (req, res) => {
       });
     }
     
-    await City.findByIdAndDelete(req.params.id);
+    await State.findByIdAndDelete(req.params.id);
     
     res.status(200).json({
       success: true,
       data: {},
-      message: 'City deleted successfully'
+      message: 'State deleted successfully'
     });
   } catch (error) {
-    console.error('Delete City Error:', error);
+    console.error('Delete State Error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -321,10 +283,10 @@ exports.deleteCity = async (req, res) => {
   }
 };
 
-// @desc    Get cities by type (domestic or international)
-// @route   GET /api/cities/type/:type
+// @desc    Get states by type (domestic or international)
+// @route   GET /api/states/type/:type
 // @access  Public
-exports.getCitiesByType = async (req, res) => {
+exports.getStatesByType = async (req, res) => {
   try {
     const { type } = req.params;
     
@@ -335,15 +297,15 @@ exports.getCitiesByType = async (req, res) => {
       });
     }
     
-    const cities = await City.find({ type });
+    const states = await State.find({ type });
     
     res.status(200).json({
       success: true,
-      count: cities.length,
-      data: cities,
+      count: states.length,
+      data: states,
     });
   } catch (error) {
-    console.error('Get Cities by Type Error:', error);
+    console.error('Get States by Type Error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -352,10 +314,10 @@ exports.getCitiesByType = async (req, res) => {
   }
 };
 
-// @desc    Search cities by name or country
-// @route   GET /api/cities/search
+// @desc    Search states by name or country
+// @route   GET /api/states/search
 // @access  Public
-exports.searchCities = async (req, res) => {
+exports.searchStates = async (req, res) => {
   try {
     const { keyword } = req.query;
     
@@ -366,7 +328,7 @@ exports.searchCities = async (req, res) => {
       });
     }
     
-    const cities = await City.find({
+    const states = await State.find({
       $or: [
         { name: { $regex: keyword, $options: 'i' } },
         { country: { $regex: keyword, $options: 'i' } }
@@ -375,11 +337,11 @@ exports.searchCities = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      count: cities.length,
-      data: cities,
+      count: states.length,
+      data: states,
     });
   } catch (error) {
-    console.error('Search Cities Error:', error);
+    console.error('Search States Error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -388,45 +350,93 @@ exports.searchCities = async (req, res) => {
   }
 };
 
-// @desc    Get packages by city ID
-// @route   GET /api/cities/:id/packages
+// @desc    Get cities by state ID
+// @route   GET /api/states/:id/cities
 // @access  Public
-exports.getPackagesByCity = async (req, res) => {
+exports.getCitiesByState = async (req, res) => {
   try {
-    // Validate city ID
+    // Validate state ID
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid city ID format'
+        message: 'Invalid state ID format'
       });
     }
     
-    // Check if city exists
-    const city = await City.findById(req.params.id);
+    // Check if state exists
+    const state = await State.findById(req.params.id);
     
-    if (!city) {
+    if (!state) {
       return res.status(404).json({
         success: false,
-        message: 'City not found'
+        message: 'State not found'
       });
     }
     
-    // Get packages for this city
+    // Get cities for this state
+    const City = require('../models/City');
+    const cities = await City.find({ state: req.params.id });
+    
+    res.status(200).json({
+      success: true,
+      count: cities.length,
+      data: cities,
+      stateInfo: {
+        name: state.name,
+        country: state.country,
+        type: state.type
+      }
+    });
+  } catch (error) {
+    console.error('Get Cities by State Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get packages by state ID
+// @route   GET /api/states/:id/packages
+// @access  Public
+exports.getPackagesByState = async (req, res) => {
+  try {
+    // Validate state ID
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid state ID format'
+      });
+    }
+    
+    // Check if state exists
+    const state = await State.findById(req.params.id);
+    
+    if (!state) {
+      return res.status(404).json({
+        success: false,
+        message: 'State not found'
+      });
+    }
+    
+    // Get packages for this state
     const Package = require('../models/Package');
-    const packages = await Package.find({ city: req.params.id });
+    const packages = await Package.find({ state: req.params.id })
+                                 .populate('city', 'name country');
     
     res.status(200).json({
       success: true,
       count: packages.length,
       data: packages,
-      cityInfo: {
-        name: city.name,
-        country: city.country,
-        type: city.type
+      stateInfo: {
+        name: state.name,
+        country: state.country,
+        type: state.type
       }
     });
   } catch (error) {
-    console.error('Get Packages by City Error:', error);
+    console.error('Get Packages by State Error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',
