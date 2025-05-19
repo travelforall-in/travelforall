@@ -5,14 +5,13 @@ import { FaRupeeSign, FaSortAmountDownAlt } from "react-icons/fa";
 import { TbBeach, TbFilter } from "react-icons/tb";
 import { BiTimeFive } from "react-icons/bi";
 import Navbar from "@/components/Navbar";
-import PackageCard from "./PackageCard"; // or "@/components/PackageCard" if it's in components
-import { commonService } from "@/service/commonService"; // Adjust the path based on your file structure
-import DestinationCard from "@/components/DestinationCard";
+import PackageCard from "@/pages/PackageCard"; // adjust path as needed
+import { commonService } from "@/service/commonService";
 
-export default function DomesticPage() {
-  const [states, setStates] = useState([]);
+export default function PackagesPage() {
+  const [packages, setPackages] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(50000);
+  const [maxPrice, setMaxPrice] = useState(200000);
   const [destination, setDestination] = useState("");
   const [duration, setDuration] = useState("");
   const [sort, setSort] = useState("");
@@ -30,11 +29,12 @@ export default function DomesticPage() {
         ...(destination && { destination }),
         ...(duration && { duration }),
         ...(sort && { sort }),
-        type: "domestic", // Add this or make it dynamic
       };
 
-      const response = await commonService.getAll("states", filters); // Ensure the endpoint is correct
-      setStates(response.data.data);
+      const response = await commonService.getAll("packages", filters);
+      setPackages(response.data.data);
+      console.log(response.data);
+      
       setTotalPages(response.data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching packages:", error);
@@ -72,7 +72,7 @@ export default function DomesticPage() {
           <input
             type="range"
             min="0"
-            max="50000"
+            max="200000"
             value={minPrice}
             onChange={(e) => setMinPrice(Number(e.target.value))}
             className="w-full accent-orange-600 mt-1"
@@ -85,7 +85,7 @@ export default function DomesticPage() {
           <input
             type="range"
             min="0"
-            max="50000"
+            max="200000"
             value={maxPrice}
             onChange={(e) => setMaxPrice(Number(e.target.value))}
             className="w-full accent-orange-600 mt-1"
@@ -102,7 +102,7 @@ export default function DomesticPage() {
             onChange={(e) => setDestination(e.target.value)}
             className="w-full border mt-1 p-2 rounded"
           >
-            <option value="">Select Destination</option>
+            <option value="">All Destinations</option>
             <option value="Manali">Manali</option>
             <option value="Goa">Goa</option>
             <option value="Shimla">Shimla</option>
@@ -126,7 +126,6 @@ export default function DomesticPage() {
             onChange={(e) => setDuration(parseInt(e.target.value))}
             className="w-full accent-orange-600 mt-1"
           />
-
           <div className="flex justify-between text-xs text-gray-600 mt-1">
             <span>1</span>
             <span>20</span>
@@ -138,7 +137,6 @@ export default function DomesticPage() {
           <label className="flex items-center gap-2 text-orange-600 text-sm font-medium">
             <FaSortAmountDownAlt /> Sort By
           </label>
-
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
@@ -152,7 +150,6 @@ export default function DomesticPage() {
           </select>
         </div>
 
-        {/* Reset Button */}
         <button
           onClick={resetFilters}
           className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600 mt-4"
@@ -164,41 +161,43 @@ export default function DomesticPage() {
       {/* Main Content */}
       <main className="pt-20 flex-1 p-6 bg-gray-50">
         <h1 className="text-2xl font-bold text-green-800 mb-6">
-          Domestic Travel Destination 
-        </h1>
+          All Travel Packages
+        </h1>   
 
-        {/* Package Grid or Message */}
-        {states && states.length > 0 ? (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-    {states.map((city) => (
-      <DestinationCard key={city._id} cityData={city} />
-    ))}
-  </div>
-) : (
-  <p className="text-gray-500">No destinations found matching your filters.</p>
-)}
+        {packages && packages.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {packages.map((pkg) => (
+              <PackageCard key={pkg._id} packageData={pkg} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">No packages found matching your filters.</p>
+        )}
+
+{/* Pagination */}
+<div className="mt-8 flex justify-center items-center gap-4">
+  <button
+    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+    disabled={page === 1}
+    className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+  >
+    Previous
+  </button>
+
+  <span className="text-green-800 font-semibold">
+    Page {page} of {totalPages}
+  </span>
+
+  <button
+    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+    disabled={page === totalPages}
+    className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+  >
+    Next
+  </button>
+</div>
 
 
-        {/* Pagination */}
-        <div className="mt-8 flex justify-center items-center gap-4">
-          <button
-            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            disabled={page === 1}
-            className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="text-green-800 font-semibold">
-            Page {page} of {totalPages}
-          </span>
-          <button
-            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={page === totalPages}
-            className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
       </main>
     </div>
   );
