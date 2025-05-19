@@ -34,6 +34,11 @@ import AdminCreatePackage from "./pages/AdminCreatePackage";
 import AdminPanel from "./pages/AdminPanel";
 import AdminPackageList from "./pages/AdminPackageList";
 import ManageUsers from "./pages/ManageUsers";
+import Destination from "./pages/Destination";
+import DomesticDestination from "./pages/DestinationDomestic";
+import InternationalDestination from "./pages/DestinationInternational";
+import CityPackages from "./pages/CityPackages";
+import CreateCity from "./pages/CreateCity";
 
 const queryClient = new QueryClient();
 
@@ -53,9 +58,9 @@ const App = () => (
           <Route path="/search-results" element={<SearchResultsPage />} />
           {/* <Route path="/packages" element={<AllPackages />} /> */}
           <Route path="/account" element={<Account />} />
-           <Route path="/account-settings" element={<AccountSettings />} />
-            <Route path="/change-password"element={<ChangePassword />} />
-             <Route path="/payment-history"element={<PaymentHistory />} />
+          <Route path="/account-settings" element={<AccountSettings />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/payment-history" element={<PaymentHistory />} />
           <Route path="/my-packages" element={<MyPackages />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/destinations/:type" element={<Domestic />} />
@@ -64,6 +69,17 @@ const App = () => (
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/admin/dashboard" element={<AdminPanel />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
+          <Route path="/admin/destination" element={<Destination />} />
+          <Route
+            path="/admin/destination/domestic"
+            element={<DomesticDestination />}
+          />
+          <Route
+            path="/admin/destination/international"
+            element={<InternationalDestination />}
+          />
+          <Route path="/admin/city/:id/packages" element={<CityPackages />} />
+          <Route path="/admin/create-city" element={<CreateCity />} />
           <Route path="/admin/package-list" element={<AdminPackageList />} />
           <Route
             path="/admin/create-package"
