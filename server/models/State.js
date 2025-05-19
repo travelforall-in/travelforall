@@ -1,13 +1,13 @@
-// models/City.js
+// models/State.js
 const mongoose = require('mongoose');
 
-const CitySchema = new mongoose.Schema({
+const StateSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Please add a city name'],
+    required: [true, 'Please add a state name'],
     trim: true,
     unique: true,
-    maxlength: [100, 'City name cannot be more than 100 characters']
+    maxlength: [100, 'State name cannot be more than 100 characters']
   },
   country: {
     type: String,
@@ -16,7 +16,7 @@ const CitySchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    required: [true, 'Please specify city type'],
+    required: [true, 'Please specify state type'],
     enum: ['domestic', 'international'],
   },
   description: {
@@ -26,11 +26,6 @@ const CitySchema = new mongoose.Schema({
   images: {
     type: [String],
     default: []
-  },
-  // models/City.js - Add this field to your existing City schema
-  state: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'State'
   },
   weather: {
     type: String,
@@ -54,6 +49,10 @@ const CitySchema = new mongoose.Schema({
   culturalNotes: {
     type: String
   },
+  cities: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'City'
+  }],
   createdAt: {
     type: Date,
     default: Date.now
@@ -88,10 +87,10 @@ const CitySchema = new mongoose.Schema({
 });
 
 // Method to get full image URLs
-CitySchema.methods.getFullImageUrls = function() {
+StateSchema.methods.getFullImageUrls = function() {
   return (this.images || []).map(imagePath => 
     imagePath ? `http://localhost:5000${imagePath}` : null
   ).filter(Boolean);
 };
 
-module.exports = mongoose.model('City', CitySchema);
+module.exports = mongoose.model('State', StateSchema);
