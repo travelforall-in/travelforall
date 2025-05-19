@@ -65,6 +65,11 @@ const PackageSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please specify accommodation type'],
   },
+    // models/Package.js - Add this field to your existing Package schema
+  state: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'State'
+  },
   images: {
     type: [String],
     default: []
