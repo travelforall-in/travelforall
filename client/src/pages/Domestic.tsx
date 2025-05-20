@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaRupeeSign, FaSortAmountDownAlt } from "react-icons/fa";
-import { TbBeach, TbFilter } from "react-icons/tb";
-import { BiTimeFive } from "react-icons/bi";
 import Navbar from "@/components/Navbar";
-import PackageCard from "./PackageCard"; // or "@/components/PackageCard" if it's in components
-import { commonService } from "@/service/commonService"; // Adjust the path based on your file structure
 import DestinationCard from "@/components/DestinationCard";
+import { commonService } from "@/service/commonService";
+import Filters from "@/components/shared/Filters";
 
 export default function DomesticPage() {
   const [states, setStates] = useState([]);
@@ -27,13 +24,15 @@ export default function DomesticPage() {
         limit,
         ...(minPrice && { minPrice }),
         ...(maxPrice && { maxPrice }),
-        ...(destination && { destination }),
+        ...(destination && { name: destination }),  // Destination filter by name
         ...(duration && { duration }),
         ...(sort && { sort }),
-        type: "domestic", // Add this or make it dynamic
+        type: "domestic", // Filter by domestic packages only
       };
 
-      const response = await commonService.getAll("states", filters); // Ensure the endpoint is correct
+      console.log("Filters sent to backend:", filters);
+
+      const response = await commonService.getAll("states", filters);
       setStates(response.data.data);
       setTotalPages(response.data.totalPages || 1);
     } catch (error) {
@@ -47,139 +46,47 @@ export default function DomesticPage() {
 
   const resetFilters = () => {
     setMinPrice(0);
-    setMaxPrice(200000);
+    setMaxPrice(50000);
     setDestination("");
     setDuration("");
     setSort("");
     setPage(1);
   };
 
+  // Extract unique destinations using the 'name' field
+  const availableDestinations = [...new Set(states.map((state) => state.name))].sort();
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       <Navbar />
 
-      {/* Sidebar Filters */}
-      <aside className="pt-20 w-72 bg-white shadow-md p-6 space-y-5">
-        <h2 className="text-xl font-bold text-green-700 mb-2 flex items-center gap-2">
-          <TbFilter /> Filters
-        </h2>
+      {/* Filters Sidebar */}
+      <Filters
+        destination={destination}
+        sort={sort}
+        availableDestinations={availableDestinations}
+        setDestination={setDestination}
+        setSort={setSort}
+        resetFilters={resetFilters}
+      />
 
-        {/* Price Filters */}
-        <div>
-          <label className="flex items-center gap-2 text-orange-600 text-sm font-medium">
-            <FaRupeeSign /> Min Price: ₹{minPrice}
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="50000"
-            value={minPrice}
-            onChange={(e) => setMinPrice(Number(e.target.value))}
-            className="w-full accent-orange-600 mt-1"
-          />
-        </div>
-        <div>
-          <label className="flex items-center gap-2 text-orange-600 text-sm font-medium">
-            <FaRupeeSign /> Max Price: ₹{maxPrice}
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="50000"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(Number(e.target.value))}
-            className="w-full accent-orange-600 mt-1"
-          />
-        </div>
-
-        {/* Destination Filter */}
-        <div>
-          <label className="flex items-center gap-2 text-orange-600 text-sm font-medium">
-            <TbBeach /> Destination
-          </label>
-          <select
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            className="w-full border mt-1 p-2 rounded"
-          >
-            <option value="">Select Destination</option>
-            <option value="Manali">Manali</option>
-            <option value="Goa">Goa</option>
-            <option value="Shimla">Shimla</option>
-            <option value="Jaisalmer">Jaisalmer</option>
-          </select>
-        </div>
-
-        {/* Duration Filter */}
-        <div>
-          <label className="flex items-center gap-2 text-orange-600 text-sm font-medium mb-1">
-            <BiTimeFive /> Duration (Max Days):
-            <span className="ml-2 text-gray-800">{duration || 1} Days</span>
-          </label>
-
-          <input
-            type="range"
-            min={1}
-            max={20}
-            step={1}
-            value={duration || 1}
-            onChange={(e) => setDuration(parseInt(e.target.value))}
-            className="w-full accent-orange-600 mt-1"
-          />
-
-          <div className="flex justify-between text-xs text-gray-600 mt-1">
-            <span>1</span>
-            <span>20</span>
-          </div>
-        </div>
-
-        {/* Sort Filter */}
-        <div>
-          <label className="flex items-center gap-2 text-orange-600 text-sm font-medium">
-            <FaSortAmountDownAlt /> Sort By
-          </label>
-
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="w-full border mt-1 p-2 rounded"
-          >
-            <option value="-createdAt">Newest First</option>
-            <option value="price">Price: Low to High</option>
-            <option value="-price">Price: High to Low</option>
-            <option value="duration.days">Duration: Short to Long</option>
-            <option value="-duration.days">Duration: Long to Short</option>
-          </select>
-        </div>
-
-        {/* Reset Button */}
-        <button
-          onClick={resetFilters}
-          className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600 mt-4"
-        >
-          Reset Filters
-        </button>
-      </aside>
-
-      {/* Main Content */}
+      {/*  Main Content */}
       <main className="pt-20 flex-1 p-6 bg-gray-50">
         <h1 className="text-2xl font-bold text-green-800 mb-6">
-          Domestic Travel Destination 
+          Domestic Travel Destination
         </h1>
 
-        {/* Package Grid or Message */}
         {states && states.length > 0 ? (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-    {states.map((city) => (
-      <DestinationCard key={city._id} cityData={city} />
-    ))}
-  </div>
-) : (
-  <p className="text-gray-500">No destinations found matching your filters.</p>
-)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {states.map((city) => (
+              <DestinationCard key={city._id} cityData={city} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">No destinations found matching your filters.</p>
+        )}
 
-
-        {/* Pagination */}
+        {/*Pagination */}
         <div className="mt-8 flex justify-center items-center gap-4">
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
