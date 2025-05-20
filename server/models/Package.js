@@ -1,4 +1,3 @@
-// models/Package.js (Updated)
 const mongoose = require('mongoose');
 
 const PackageSchema = new mongoose.Schema({
@@ -20,7 +19,7 @@ const PackageSchema = new mongoose.Schema({
   city: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'City',
-    required: [true, 'Please select a city']
+    // Removed the required constraint
   },
   duration: {
     days: {
@@ -65,7 +64,6 @@ const PackageSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please specify accommodation type'],
   },
-    // models/Package.js - Add this field to your existing Package schema
   state: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'State'

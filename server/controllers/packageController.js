@@ -51,7 +51,7 @@ exports.createPackage = async (req, res) => {
     if (packageData.price) packageData.price = parseFloat(packageData.price);
     packageData.featured = packageData.featured === 'true';
 
-    // Validate city exists
+    // Validate city only if it's provided
     if (packageData.city) {
       const City = require('../models/City');
       const cityExists = await City.findById(packageData.city);
@@ -74,7 +74,7 @@ exports.createPackage = async (req, res) => {
       }
     }
 
-    // Validate state exists
+    // Validate state exists if provided
     if (packageData.state) {
       const State = require('../models/State');
       const stateExists = await State.findById(packageData.state);
@@ -95,8 +95,10 @@ exports.createPackage = async (req, res) => {
     // Create package
     const newPackage = await Package.create(packageData);
 
-    // Populate city information for the response
-    await newPackage.populate('city');
+    // Populate city information for the response if city exists
+    if (newPackage.city) {
+      await newPackage.populate('city');
+    }
 
     res.status(201).json({
       success: true,
