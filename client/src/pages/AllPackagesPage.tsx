@@ -2,41 +2,54 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-import DestinationCard from "@/components/DestinationCard";
+import PackageCard from "@/pages/PackageCard";
 import { commonService } from "@/service/commonService";
-import Filters from "@/components/shared/Filters";
+import Filter from "@/components/shared/Filter";
 
-export default function DomesticPage() {
-  const [states, setStates] = useState([]);
+export default function PackagesPage() {
+  const [packages, setPackages] = useState([]);
+  const [availableDestinations, setAvailableDestinations] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(50000);
+  const [maxPrice, setMaxPrice] = useState(200000);
   const [destination, setDestination] = useState("");
   const [duration, setDuration] = useState("");
   const [sort, setSort] = useState("");
   const [page, setPage] = useState(1);
-  const [limit] = useState(6);
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchPackages = async () => {
     try {
+      const limit = 6;
       const filters: any = {
         page,
         limit,
         ...(minPrice && { minPrice }),
         ...(maxPrice && { maxPrice }),
-        ...(destination && { name: destination }),  // Destination filter by name
+        ...(destination && { destination }),
         ...(duration && { duration }),
         ...(sort && { sort }),
-        type: "domestic", // Filter by domestic packages only
       };
 
-      console.log("Filters sent to backend:", filters);
-
-      const response = await commonService.getAll("states", filters);
-      setStates(response.data.data);
-      setTotalPages(response.data.totalPages || 1);
+      const response = await commonService.getAll("packages", filters);
+      setPackages(response.data.data);
+      const total = response.data.total;
+      setTotalPages(Math.ceil(total / limit) || 1);
     } catch (error) {
       console.error("Error fetching packages:", error);
+    }
+  };
+
+  const fetchDestinationsFromPackages = async () => {
+    try {
+      const response = await commonService.getAll("packages", { limit: 1000 });
+      const allPackages = response.data.data;
+
+      const cities = [
+        ...new Set(allPackages.map((pkg) => pkg.destination).filter(Boolean)),
+      ];
+      setAvailableDestinations(cities);
+    } catch (error) {
+      console.error("Error fetching destinations from packages:", error);
     }
   };
 
@@ -44,49 +57,56 @@ export default function DomesticPage() {
     fetchPackages();
   }, [minPrice, maxPrice, destination, duration, sort, page]);
 
+  useEffect(() => {
+    fetchDestinationsFromPackages();
+  }, []);
+
   const resetFilters = () => {
     setMinPrice(0);
-    setMaxPrice(50000);
+    setMaxPrice(200000);
     setDestination("");
     setDuration("");
     setSort("");
     setPage(1);
   };
 
-  // Extract unique destinations using the 'name' field
-  const availableDestinations = [...new Set(states.map((state) => state.name))].sort();
-
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       <Navbar />
 
-      {/* Filters Sidebar */}
-      <Filters
+      {/* Sidebar Filters */}
+      <Filter
+        minPrice={minPrice}
+        maxPrice={maxPrice}
         destination={destination}
+        duration={duration}
         sort={sort}
         availableDestinations={availableDestinations}
+        setMinPrice={setMinPrice}
+        setMaxPrice={setMaxPrice}
         setDestination={setDestination}
+        setDuration={setDuration}
         setSort={setSort}
         resetFilters={resetFilters}
       />
 
-      {/*  Main Content */}
+      {/* Main Content */}
       <main className="pt-20 flex-1 p-6 bg-gray-50">
         <h1 className="text-2xl font-bold text-green-800 mb-6">
-          Domestic Travel Destination
+          All Travel Packages
         </h1>
 
-        {states && states.length > 0 ? (
+        {packages && packages.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {states.map((city) => (
-              <DestinationCard key={city._id} cityData={city} />
+            {packages.map((pkg) => (
+              <PackageCard key={pkg._id} packageData={pkg} />
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">No destinations found matching your filters.</p>
+          <p className="text-gray-500">No packages found matching your filters.</p>
         )}
 
-        {/*Pagination */}
+        {/* Pagination */}
         <div className="mt-8 flex justify-center items-center gap-4">
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}

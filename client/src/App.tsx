@@ -39,6 +39,7 @@ import DomesticDestination from "./pages/DestinationDomestic";
 import InternationalDestination from "./pages/DestinationInternational";
 import CityPackages from "./pages/CityPackages";
 import CreateCity from "./pages/CreateCity";
+import AllPackagesPage from "./pages/AllPackagesPage";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/destinations" element={<AllDestinations />} />
+          <Route path="/all-packages" element={<AllPackagesPage />} />  
           {/* <Route path="/explore-packages" element={<ExplorePackages />} /> */}
           <Route path="/search-results" element={<SearchResultsPage />} />
           {/* <Route path="/packages" element={<AllPackages />} /> */}
@@ -80,6 +82,8 @@ const App = () => (
           />
           <Route path="/admin/city/:id/packages" element={<CityPackages />} />
           <Route path="/admin/create-city" element={<CreateCity />} />
+          
+
           <Route path="/admin/package-list" element={<AdminPackageList />} />
           <Route
             path="/admin/create-package"
