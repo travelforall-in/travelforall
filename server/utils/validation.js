@@ -96,7 +96,7 @@ exports.loginValidation = [
     .withMessage('Password is required')
 ];
 
-// Package validation rules with city support
+// Package validation rules with city as optional
 exports.packageValidation = [
   body('name')
     .notEmpty()
@@ -116,10 +116,9 @@ exports.packageValidation = [
     .withMessage('Destination is required'),
   
   body('city')
-    .notEmpty()
-    .withMessage('City ID is required')
+    .optional() // Changed from notEmpty to optional
     .isMongoId()
-    .withMessage('City ID must be a valid MongoDB ObjectId'),
+    .withMessage('If provided, City ID must be a valid MongoDB ObjectId'),
   
   body('duration.days')
     .notEmpty()
