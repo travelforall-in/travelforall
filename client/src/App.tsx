@@ -29,7 +29,6 @@ import Account from "./pages/Account";
 import AccountSettings from "./pages/AccountSettings";
 import ChangePassword from "./pages/ChangePassword";
 import PaymentHistory from "./pages/PaymentHistory";
-import AdminDashboard from "./pages/AdminDashboard";
 import AdminCreatePackage from "./pages/AdminCreatePackage";
 import AdminPanel from "./pages/AdminPanel";
 import AdminPackageList from "./pages/AdminPackageList";
@@ -37,8 +36,8 @@ import ManageUsers from "./pages/ManageUsers";
 import Destination from "./pages/Destination";
 import DomesticDestination from "./pages/DestinationDomestic";
 import InternationalDestination from "./pages/DestinationInternational";
-import CityPackages from "./pages/CityPackages";
-import CreateCity from "./pages/CreateCity";
+import StatePackages from "./pages/StatePackages";
+import CreateState from "./pages/CreateState";
 import AllPackagesPage from "./pages/AllPackagesPage";
 
 const queryClient = new QueryClient();
@@ -55,7 +54,7 @@ const App = () => (
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/destinations" element={<AllDestinations />} />
-          <Route path="/all-packages" element={<AllPackagesPage />} />  
+          <Route path="/all-packages" element={<AllPackagesPage />} />
           {/* <Route path="/explore-packages" element={<ExplorePackages />} /> */}
           <Route path="/search-results" element={<SearchResultsPage />} />
           {/* <Route path="/packages" element={<AllPackages />} /> */}
@@ -80,10 +79,8 @@ const App = () => (
             path="/admin/destination/international"
             element={<InternationalDestination />}
           />
-          <Route path="/admin/city/:id/packages" element={<CityPackages />} />
-          <Route path="/admin/create-city" element={<CreateCity />} />
-          
-
+          <Route path="/admin/state/:id/packages" element={<StatePackages />} />
+          <Route path="/admin/create-state" element={<CreateState />} />
           <Route path="/admin/package-list" element={<AdminPackageList />} />
           <Route
             path="/admin/create-package"

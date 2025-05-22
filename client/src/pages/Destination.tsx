@@ -24,11 +24,13 @@ const Destination = () => {
         onDestinationClick={() => navigate("/admin/destination")}
       />
       <div className="flex-1 p-6 bg-gray-50 min-h-screen">
-        <header className="flex items-center gap-2 mb-6">
-          <Menu
-            className="text-2xl cursor-pointer"
+        <header className="flex items-center gap-4 mb-6">
+          <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-          />
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
           <h1 className="text-2xl font-bold">Choose Destination Type</h1>
         </header>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

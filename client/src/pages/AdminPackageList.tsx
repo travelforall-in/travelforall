@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "@/components/Sidebar";
 import { toast } from "sonner";
-import { Menu, Bell, User } from "lucide-react";
+import { Menu } from "lucide-react";
 
 interface TravelPackage {
   id: string;
@@ -76,11 +76,13 @@ const PackageListPage: React.FC = () => {
       />
       <div className="flex-1 p-6 bg-gray-50 min-h-screen">
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
-            <Menu
-              className="text-2xl cursor-pointer"
+          <div className="flex items-center gap-4">
+            <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-            />
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
             <h1 className="text-2xl font-bold">Travel Packages</h1>
           </div>
           <button
