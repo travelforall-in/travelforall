@@ -1,336 +1,404 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { toast, Toaster } from "sonner";
 
-const CreatePackage: React.FC = () => {
-  const navigate = useNavigate();
+const AdminCreatePackage = () => {
   const [formData, setFormData] = useState({
     name: "",
     type: "",
     destination: "",
-    durationDays: "",
-    durationNights: "",
-    price: "",
+    state: "",
+    duration: { days: 0, nights: 0 },
+    price: 0,
     highlights: "",
-    itineraryDay: "",
-    itineraryTitle: "",
-    itineraryDesc: "",
-    itineraryMeals: "",
+    itinerary: "",
     inclusions: "",
     exclusions: "",
     transportation: "",
     accommodation: "",
-    featured: false,
-    images: null as File | null,
+    images: [],
   });
+
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [states, setStates] = useState<{ _id: string; name: string }[]>([]);
+
+  const adminToken = localStorage.getItem("token");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/states");
+        setStates(res.data.data);
+      } catch (err) {
+        console.error("Failed to fetch states", err);
+      }
+    };
+    fetchStates();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value, type, checked, files } = e.target as any;
-    if (type === "checkbox") {
-      setFormData({ ...formData, [name]: checked });
-    } else if (type === "file") {
-      setFormData({ ...formData, images: files[0] });
+    const { name, value } = e.target;
+
+    if (name === "days" || name === "nights") {
+      const val = Math.max(0, parseInt(value) || 0);
+      setFormData((prev) => ({
+        ...prev,
+        duration: {
+          ...prev.duration,
+          [name]: val,
+        },
+      }));
+    } else if (name === "price") {
+      const val = Math.max(0, parseFloat(value) || 0);
+      setFormData((prev) => ({
+        ...prev,
+        price: val,
+      }));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImageFiles(Array.from(e.target.files));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      toast.error("Admin token not found. Please log in.");
+    if (formData.duration.days <= 0) {
+      toast.error("Number of days must be greater than 0");
+      return;
+    }
+    if (formData.duration.nights < 0) {
+      toast.error("Number of nights cannot be negative");
+      return;
+    }
+    if (formData.price < 0) {
+      toast.error("Price cannot be negative");
       return;
     }
 
-    try {
-      const payload = new FormData();
-      payload.append("name", formData.name);
-      payload.append("type", formData.type);
-      payload.append("destination", formData.destination);
-      payload.append("duration.days", formData.durationDays);
-      payload.append("duration.nights", formData.durationNights);
-      payload.append("price", formData.price);
-      const highlightsArray = formData.highlights
-        .split(",")
-        .map((item) => item.trim());
-      highlightsArray.forEach((highlight) => {
-        payload.append("highlights", highlight);
-      });
-      payload.append("itinerary.day", formData.itineraryDay);
-      payload.append("itinerary.title", formData.itineraryTitle);
-      payload.append("itinerary.desc", formData.itineraryDesc);
-      payload.append("itinerary.meals", formData.itineraryMeals);
-      payload.append("inclusions", formData.inclusions);
-      payload.append("exclusions", formData.exclusions);
-      payload.append("transportation", formData.transportation);
-      payload.append("accommodation", formData.accommodation);
-      payload.append("featured", String(formData.featured));
-      if (formData.images) {
-        payload.append("images", formData.images);
-      }
+    const formPayload = new FormData();
 
-      const response = await axios.post(
+    imageFiles.forEach((img) => formPayload.append("images", img));
+    formPayload.append("name", formData.name);
+    formPayload.append("type", formData.type);
+    formPayload.append("destination", formData.destination);
+    formPayload.append("state", formData.state);
+
+    if (!formData.duration.days || formData.duration.days <= 0) {
+      toast.error("Please enter a valid number of days.");
+      return;
+    }
+
+    formPayload.append("duration.days", String(formData.duration.days));
+    formPayload.append("duration.nights", String(formData.duration.nights));
+
+    formPayload.append("price", String(formData.price));
+
+    formPayload.append(
+      "highlights",
+      JSON.stringify(formData.highlights.split(",").map((item) => item.trim()))
+    );
+
+    const itineraryLines = formData.itinerary
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    const itineraryObjects = itineraryLines.map((desc, index) => ({
+      day: index + 1,
+      description: desc,
+    }));
+
+    formPayload.append("itinerary", JSON.stringify(itineraryObjects));
+
+    formPayload.append(
+      "inclusions",
+      JSON.stringify(formData.inclusions.split(",").map((item) => item.trim()))
+    );
+    formPayload.append(
+      "exclusions",
+      JSON.stringify(formData.exclusions.split(",").map((item) => item.trim()))
+    );
+    formPayload.append("transportation", formData.transportation);
+    formPayload.append("accommodation", formData.accommodation);
+
+    try {
+      const res = await axios.post(
         "http://localhost:5000/api/packages",
-        payload,
+        formPayload,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${adminToken}`,
           },
         }
       );
-
       toast.success("Package created successfully!");
       setFormData({
         name: "",
         type: "",
         destination: "",
-        durationDays: "",
-        durationNights: "",
-        price: "",
+        state: "",
+        duration: { days: 0, nights: 0 },
+        price: 0,
         highlights: "",
-        itineraryDay: "",
-        itineraryTitle: "",
-        itineraryDesc: "",
-        itineraryMeals: "",
+        itinerary: "",
         inclusions: "",
         exclusions: "",
         transportation: "",
         accommodation: "",
-        featured: false,
-        images: null,
+        images: [],
       });
-      navigate("/admin/package-list");
-    } catch (error: any) {
+      setImageFiles([]);
+      navigate(-1);
+    } catch (err: any) {
+      console.error("Error creating package:", err);
       toast.error(
-        "Failed to create package. " + (error.response?.data?.message || "")
+        err.response?.data?.errors?.[0]?.msg || "Failed to create package"
       );
-      console.error("Error:", error);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <Toaster />
-      <h2 className="text-2xl font-semibold mb-6">Create New Travel Package</h2>
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-2 gap-4"
-        encType="multipart/form-data"
-      >
-        <div>
-          <label className="block">Package Name</label>
-          <input
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="e.g. Cultural Europe Tour"
-            className="w-full border p-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="block">Package Type</label>
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="w-full border p-2"
-            required
-          >
-            <option value="">Select</option>
-            <option value="domestic">domestic</option>
-            <option value="international">international</option>
-          </select>
-        </div>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="bg-white shadow-md rounded-md p-6 w-full max-w-4xl">
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Create New Travel Package
+        </h2>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          {/* Package Name */}
+          <div>
+            <label className="block font-medium mb-1">Package Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Enter package name"
+              value={formData.name}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              required
+            />
+          </div>
 
-        <div>
-          <label className="block">Destinations</label>
-          <input
-            name="destination"
-            value={formData.destination}
-            onChange={handleChange}
-            placeholder="e.g. Paris · Rome · Barcelona"
-            className="w-full border p-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="block">Duration (Days)</label>
-          <input
-            type="number"
-            name="durationDays"
-            value={formData.durationDays}
-            onChange={handleChange}
-            placeholder="e.g. 10"
-            className="w-full border p-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="block">Duration (Nights)</label>
-          <input
-            type="number"
-            name="durationNights"
-            value={formData.durationNights}
-            onChange={handleChange}
-            placeholder="e.g. 9"
-            className="w-full border p-2"
-            required
-          />
-        </div>
-        <div>
-          <label className="block">Price (INR)</label>
-          <input
-            type="number"
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            placeholder="e.g. 185000"
-            className="w-full border p-2"
-            required
-          />
-        </div>
+          {/* Type */}
+          <div>
+            <label className="block font-medium mb-1">Type</label>
+            <select
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              required
+            >
+              <option value="">Select type</option>
+              <option value="domestic">Domestic</option>
+              <option value="international">International</option>
+            </select>
+          </div>
 
-        <div className="col-span-2">
-          <label className="block">Highlights</label>
-          <input
-            name="highlights"
-            value={formData.highlights}
-            onChange={handleChange}
-            placeholder="e.g. Eiffel Tower, Colosseum"
-            className="w-full border p-2"
-          />
-        </div>
+          {/* Destination */}
+          <div>
+            <label className="block font-medium mb-1">Destination</label>
+            <input
+              type="text"
+              name="destination"
+              placeholder="Enter destinations (comma-separated)"
+              value={formData.destination}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              required
+            />
+          </div>
 
-        {/* Itinerary Section */}
-        <div>
-          <label className="block">Itinerary - Day</label>
-          <input
-            type="number"
-            name="itineraryDay"
-            value={formData.itineraryDay}
-            onChange={handleChange}
-            placeholder="e.g. 1"
-            className="w-full border p-2"
-          />
-        </div>
-        <div>
-          <label className="block">Itinerary - Title</label>
-          <input
-            name="itineraryTitle"
-            value={formData.itineraryTitle}
-            onChange={handleChange}
-            placeholder="e.g. Paris Arrival & Cruise"
-            className="w-full border p-2"
-          />
-        </div>
-        <div className="col-span-2">
-          <label className="block">Itinerary - Description</label>
-          <textarea
-            name="itineraryDesc"
-            value={formData.itineraryDesc}
-            onChange={handleChange}
-            placeholder="e.g. Evening river cruise…"
-            className="w-full border p-2"
-          />
-        </div>
-        <div className="col-span-2">
-          <label className="block">Meals Provided</label>
-          <input
-            name="itineraryMeals"
-            value={formData.itineraryMeals}
-            onChange={handleChange}
-            placeholder="e.g. Breakfast, Lunch, Dinner"
-            className="w-full border p-2"
-          />
-        </div>
+          {/* state Dropdown */}
+          <div>
+            <label className="block font-medium mb-1">Select state</label>
+            <select
+              name="state"
+              value={formData.state}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              required
+            >
+              <option value="">Select state</option>
+              {Array.isArray(states) &&
+                states.map((state) => (
+                  <option key={state._id} value={state._id}>
+                    {state.name}
+                  </option>
+                ))}
+            </select>
+          </div>
 
-        <div className="col-span-2">
-          <label className="block">Inclusions</label>
-          <textarea
-            name="inclusions"
-            value={formData.inclusions}
-            onChange={handleChange}
-            placeholder="e.g. 3-star hotel, breakfast"
-            className="w-full border p-2"
-          />
-        </div>
-        <div className="col-span-2">
-          <label className="block">Exclusions</label>
-          <textarea
-            name="exclusions"
-            value={formData.exclusions}
-            onChange={handleChange}
-            placeholder="e.g. Visa fees"
-            className="w-full border p-2"
-          />
-        </div>
+          {/* Duration Days */}
+          <div>
+            <label className="block font-medium mb-1">Duration (Days)</label>
+            <input
+              type="number"
+              name="days"
+              placeholder="Enter number of days"
+              value={formData.duration.days}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              min={1} // days must be at least 1
+              required
+            />
+          </div>
 
-        <div>
-          <label className="block">Transportation Type</label>
-          <select
-            name="transportation"
-            value={formData.transportation}
-            onChange={handleChange}
-            className="w-full border p-2"
-          >
-            <option value="">Select</option>
-            <option value="flight">flight</option>
-            <option value="train">train</option>
-            <option value="bus">bus</option>
-          </select>
-        </div>
-        <div>
-          <label className="block">Accommodation Info</label>
-          <input
-            name="accommodation"
-            value={formData.accommodation}
-            onChange={handleChange}
-            placeholder="e.g. 3-Star Hotels"
-            className="w-full border p-2"
-          />
-        </div>
+          {/* Duration Nights */}
+          <div>
+            <label className="block font-medium mb-1">Duration (Nights)</label>
+            <input
+              type="number"
+              name="nights"
+              placeholder="Enter number of nights"
+              value={formData.duration.nights}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              min={0} // nights can be zero
+              required
+            />
+          </div>
 
-        <div>
-          <label className="block">Upload Images</label>
-          <input
-            type="file"
-            name="images"
-            accept="image/*"
-            onChange={handleChange}
-            className="w-full"
-          />
-        </div>
-        <div>
-          <label className="block">Mark as Featured</label>
-          <input
-            type="checkbox"
-            name="featured"
-            checked={formData.featured}
-            onChange={handleChange}
-          />
-        </div>
+          {/* Price */}
+          <div>
+            <label className="block font-medium mb-1">Package Price</label>
+            <input
+              type="number"
+              name="price"
+              placeholder="Enter price (e.g. 1299)"
+              value={formData.price}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              min={0}
+              required
+            />
+          </div>
 
-        <div className="col-span-2">
-          <button
-            type="submit"
-            className="w-full bg-orange-600 text-white p-2 rounded hover:bg-orange-700"
-          >
-            Create Package
-          </button>
-        </div>
-      </form>
+          {/* Transportation */}
+          <div>
+            <label className="block font-medium mb-1">Transportation</label>
+            <input
+              type="text"
+              name="transportation"
+              placeholder="e.g. Flight, Train, Bus"
+              value={formData.transportation}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              required
+            />
+          </div>
+
+          {/* Accommodation */}
+          <div>
+            <label className="block font-medium mb-1">Accommodation</label>
+            <input
+              type="text"
+              name="accommodation"
+              placeholder="e.g. Hotel, Resort, Hostel"
+              value={formData.accommodation}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              required
+            />
+          </div>
+
+          {/* Highlights */}
+          <div className="md:col-span-2">
+            <label className="block font-medium mb-1">Highlights</label>
+            <textarea
+              name="highlights"
+              placeholder="Enter highlights, separated by commas"
+              value={formData.highlights}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              required
+            />
+          </div>
+
+          {/* Itinerary */}
+          <div className="md:col-span-2">
+            <label className="block font-medium mb-1">Itinerary</label>
+            <textarea
+              name="itinerary"
+              placeholder="Enter each itinerary item on a new line"
+              value={formData.itinerary}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              rows={5}
+              required
+            />
+          </div>
+
+          {/* Inclusions */}
+          <div className="md:col-span-2">
+            <label className="block font-medium mb-1">Inclusions</label>
+            <textarea
+              name="inclusions"
+              placeholder="Enter inclusions, separated by commas"
+              value={formData.inclusions}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              required
+            />
+          </div>
+
+          {/* Exclusions */}
+          <div className="md:col-span-2">
+            <label className="block font-medium mb-1">Exclusions</label>
+            <textarea
+              name="exclusions"
+              placeholder="Enter exclusions, separated by commas"
+              value={formData.exclusions}
+              onChange={handleChange}
+              className="border p-2 rounded-md w-full"
+              required
+            />
+          </div>
+
+          {/* Image Upload */}
+          <div className="md:col-span-2">
+            <label className="block font-medium mb-1">Upload Images</label>
+            <input
+              type="file"
+              name="images"
+              onChange={handleImageChange}
+              className="border p-2 rounded-md w-full"
+              accept="image/*"
+              multiple
+              required
+            />
+          </div>
+
+          <div className="min-w-full md:w-auto md:col-span-2 flex">
+            <button
+              type="submit"
+              className="bg-[#F97015] hover:bg-[#ea6207] text-white font-medium py-2 px-6 rounded-md shadow w-full"
+            >
+              Create Package
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
 
-export default CreatePackage;
+export default AdminCreatePackage;

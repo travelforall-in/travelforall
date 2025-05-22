@@ -68,8 +68,9 @@ const ManageUsers: React.FC = () => {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.phone.includes(searchTerm)
+      (user.name &&
+        user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.phone && user.phone.includes(searchTerm))
   );
 
   const indexOfLastUser = currentPage * usersPerPage;
@@ -85,14 +86,17 @@ const ManageUsers: React.FC = () => {
         onPackageClick={() => navigate("/admin/package-list")}
         onManageUsersClick={() => navigate("/admin/manage-users")}
         onDashboardClick={() => navigate("/admin/dashboard")}
+        onDestinationClick={() => navigate("/admin/destination")}
       />
       <div className="flex-1 p-6 bg-gray-50 min-h-screen">
         <header className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
-            <Menu
-              className="text-2xl cursor-pointer"
+          <div className="flex items-center gap-4">
+            <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-            />
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
             <h2 className="text-2xl font-bold">Manage Users</h2>
           </div>
           <div className="flex items-center gap-4"></div>
