@@ -31,18 +31,19 @@ import PaymentHistory from "./pages/PaymentHistory";
 import AdminCreatePackage from "./pages/AdminCreatePackage";
 import AdminPanel from "./pages/AdminPanel";
 import AdminPackageList from "./pages/AdminPackageList";
-import ManageUsers from "./pages/ManageUsers";
-import AllPackages from "./pages/AllPackages";
+import ManageUsers from "./pages/AdminManageUsers";
 import AllPackagesPage from "./pages/AllPackagesPage";
 import PartnerDetails from "./Parnters/PartnerDetails";
-import Destination from "./pages/Destination";
-import DomesticDestination from "./pages/DestinationDomestic";
-import InternationalDestination from "./pages/DestinationInternational";
+import Destination from "./pages/AdminDestination";
+import DomesticDestination from "./pages/AdminDestinationDomestic";
+import InternationalDestination from "./pages/AdminDestinationInternational";
 
-import StatePackages from "./pages/StatePackages";
-import CreateState from "./pages/CreateState";
+import StatePackages from "./pages/AdminStatePackages";
+import CreateState from "./pages/AdminCreateState";
 import ExplorePackages from "./pages/ExplorePackages";
 import FeaturedPackages from "./components/FeaturedPackages";
+import ViewPackages from "./pages/ViewPackages";
+import ViewPackageDetails from "./pages/ViewPackageDetails";
 
 const queryClient = new QueryClient();
 
@@ -58,11 +59,11 @@ const App = () => (
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/destinations" element={<AllDestinations />} />
-          <Route path="/all-packages" element={<AllPackagesPage />} />  
-          { <Route path="/all-packages" element={<ExplorePackages />} /> }
+          <Route path="/all-packages" element={<AllPackagesPage />} />
+          {<Route path="/all-packages" element={<ExplorePackages />} />}
           <Route path="/search-results" element={<SearchResultsPage />} />
-          <Route path="/partner-details" element={<PartnerDetails/>} />
-          <Route path="/all-packages" element={<FeaturedPackages/>} />
+          <Route path="/partner-details" element={<PartnerDetails />} />
+          <Route path="/all-packages" element={<FeaturedPackages />} />
           <Route path="/account" element={<Account />} />
           <Route path="/account-settings" element={<AccountSettings />} />
           <Route path="/change-password" element={<ChangePassword />} />
@@ -73,6 +74,11 @@ const App = () => (
           <Route path="/booking/:packageId" element={<BookingPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
+          <Route path="/packages/:id" element={<ViewPackages />} />
+          <Route
+            path="/packages/:id/details"
+            element={<ViewPackageDetails />}
+          />
           <Route path="/admin/dashboard" element={<AdminPanel />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
           <Route path="/admin/destination" element={<Destination />} />

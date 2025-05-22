@@ -12,7 +12,7 @@ type CityType = {
   image?: string[];
   description?: string;
   createdAt?: string;
-  fullImageUrls?:string[]
+  fullImageUrls?: string[];
 };
 
 type Props = {

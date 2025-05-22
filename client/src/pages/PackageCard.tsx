@@ -1,6 +1,7 @@
 import React from "react";
 import { FaRupeeSign, FaStar } from "react-icons/fa";
 import { BiTimeFive } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
 type ReviewType = {
   user: string;
@@ -70,6 +71,7 @@ const PackageCard: React.FC<Props> = ({ packageData }) => {
   } = packageData;
 
   const averageRating = getAverageRating(reviews);
+  const navigate = useNavigate();
 
   return (
     <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden">
@@ -94,23 +96,29 @@ const PackageCard: React.FC<Props> = ({ packageData }) => {
 
         {highlights?.length > 0 && (
           <p className="text-xs text-gray-700 mb-1">
-            <span className="font-semibold text-gray-800">Highlight:</span> {highlights[0]}
+            <span className="font-semibold text-gray-800">Highlight:</span>{" "}
+            {highlights[0]}
           </p>
         )}
 
         {inclusions?.length > 0 && (
           <p className="text-xs text-gray-700 mb-1">
-            <span className="font-semibold text-gray-800">Includes:</span> {inclusions[0]}
+            <span className="font-semibold text-gray-800">Includes:</span>{" "}
+            {inclusions[0]}
           </p>
         )}
 
         {reviews && reviews.length > 0 && (
           <p className="text-xs text-yellow-600 flex items-center gap-1">
-            <FaStar className="text-yellow-500" /> {averageRating} ({reviews.length} reviews)
+            <FaStar className="text-yellow-500" /> {averageRating} (
+            {reviews.length} reviews)
           </p>
         )}
 
-        <button className="mt-3 w-full bg-green-600 text-white py-1.5 rounded hover:bg-green-700 transition">
+        <button
+          className="mt-3 w-full bg-green-600 text-white py-1.5 rounded hover:bg-green-700 transition"
+          onClick={() => navigate(`/packages/${packageData._id}/details`)}
+        >
           View Details
         </button>
       </div>
