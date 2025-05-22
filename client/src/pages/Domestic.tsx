@@ -30,7 +30,7 @@ export default function DomesticPage() {
         type: "domestic", // Filter by domestic packages only
       };
 
-      console.log("Filters sent to backend:", filters);
+      // console.log("Filters sent to backend:", filters);
 
       const response = await commonService.getAll("states", filters);
       setStates(response.data.data);
