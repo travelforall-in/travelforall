@@ -1,6 +1,8 @@
+import { commonService } from "@/service/commonService";
 import React from "react";
 import { BiTimeFive } from "react-icons/bi";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { Navigate, useNavigate } from "react-router-dom";
 
 type CityType = {
   _id: string;
@@ -18,8 +20,21 @@ type Props = {
 };
 
 const DestinationCard: React.FC<Props> = ({ cityData }) => {
-  const { name, country, type, fullImageUrls, description } = cityData;
+const navigate = useNavigate();
+  const { name, country, type, fullImageUrls, description ,_id  } = cityData;
   console.log('image',fullImageUrls)
+
+  const handlePackages = async (destinationId: string) => {
+  try {
+    const parentKey = 'packages';
+    const response = await commonService.getAllByDestinationId(parentKey, destinationId);
+    // setPackages(response.data); // Or response.data.data depending on backend format
+    console.log("Packages for destination:", response.data);
+navigate(`/packages/${destinationId}`);  } catch (err) {
+    console.error("Failed to fetch packages for destination!", err);
+  }
+};
+
 
   return (
     <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden">
@@ -43,9 +58,11 @@ const DestinationCard: React.FC<Props> = ({ cityData }) => {
           <p className="text-xs text-gray-500 line-clamp-3">{description}</p>
         )}
 
-        <button className="mt-3 w-full bg-green-600 text-white py-1.5 rounded hover:bg-green-700 transition">
+        <button className="mt-3 w-full bg-green-600 text-white py-1.5 rounded hover:bg-green-700 transition"
+        onClick={() => handlePackages(_id)} >
           View Packages
         </button>
+
       </div>
     </div>
   );
