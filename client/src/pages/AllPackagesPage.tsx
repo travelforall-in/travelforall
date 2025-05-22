@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import PackageCard from "@/pages/PackageCard";
 import { commonService } from "@/service/commonService";
+import { useParams } from "react-router-dom";
+import Filter from "@/components/shared/Filter";
 
 export default function PackagesPage() {
   const { destinationId } = useParams();

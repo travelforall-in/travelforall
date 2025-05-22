@@ -11,7 +11,6 @@ import SignupPage from "./pages/SignupPage";
 // import PackagesPage from "./pages/PackagesPage";
 import NotFound from "./pages/NotFound";
 import AllDestinations from "./components/AllDestinations";
-// import ExplorePackages from "./pages/ExplorePackages";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -36,6 +35,14 @@ import ManageUsers from "./pages/ManageUsers";
 import AllPackages from "./pages/AllPackages";
 import AllPackagesPage from "./pages/AllPackagesPage";
 import PartnerDetails from "./Parnters/PartnerDetails";
+import Destination from "./pages/Destination";
+import DomesticDestination from "./pages/DestinationDomestic";
+import InternationalDestination from "./pages/DestinationInternational";
+
+import StatePackages from "./pages/StatePackages";
+import CreateState from "./pages/CreateState";
+import ExplorePackages from "./pages/ExplorePackages";
+import FeaturedPackages from "./components/FeaturedPackages";
 
 const queryClient = new QueryClient();
 
@@ -52,10 +59,10 @@ const App = () => (
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/destinations" element={<AllDestinations />} />
           <Route path="/all-packages" element={<AllPackagesPage />} />  
-          {/* <Route path="/explore-packages" element={<ExplorePackages />} /> */}
+          { <Route path="/all-packages" element={<ExplorePackages />} /> }
           <Route path="/search-results" element={<SearchResultsPage />} />
-          {/* <Route path="/packages" element={<AllPackages />} /> */}
           <Route path="/partner-details" element={<PartnerDetails/>} />
+          <Route path="/all-packages" element={<FeaturedPackages/>} />
           <Route path="/account" element={<Account />} />
           <Route path="/account-settings" element={<AccountSettings />} />
           <Route path="/change-password" element={<ChangePassword />} />

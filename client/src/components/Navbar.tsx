@@ -163,7 +163,7 @@ const Navbar: React.FC = () => {
 
           <nav className="hidden md:flex items-center space-x-6">
             <Link to="/" className="hover:text-primary">Home</Link>
-            <Link to="/packages" className="hover:text-primary">Packages</Link>
+            <Link to="/all-packages" className="hover:text-primary">Packages</Link>
             <Link to="/destinations" className="hover:text-primary">Destinations</Link>
             <Link to="/about" className="hover:text-primary">About</Link>
             <Link to="/contact" className="hover:text-primary">Contact</Link>

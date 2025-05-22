@@ -108,7 +108,7 @@ const HeroSection = () => {
             <p className="text-xl text-white/90 mb-8">
               Explore the world with exclusive deals on hotels, flights, and curated travel experiences.
             </p>
-            <Link to="/explore-packages">
+            <Link to="/all-packages">
               <Button className="bg-secondary hover:bg-secondary/90 text-white font-semibold" size="lg">
                 Explore Packages
               </Button>
