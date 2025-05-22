@@ -18,8 +18,8 @@ const Filters: React.FC<Props> = ({
   resetFilters,
 }) => {
   return (
-    <aside className="w-full md:w-64 p-4 bg-white border-r border-gray-200 sticky top-20 h-screen overflow-y-auto">
-      <h2 className="text-lg font-bold text-green-700 mb-4">Filters</h2>
+    <aside className="pt-20 w-full md:w-64 p-4 bg-white border-r border-gray-200 sticky top-20 h-screen overflow-y-auto">
+      <h2 className="text-xl font-bold text-green-700 mb-4">Filters</h2>
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -260,7 +260,7 @@ const Navbar: React.FC = () => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white px-2 pt-2 pb-4 space-y-1">
           <Link to="/" className="block px-3 py-2 hover:bg-muted rounded">Home</Link>
-          <Link to="/all-packages" className="block px-3 py-2 hover:bg-muted rounded">Packages</Link>
+          <Link to="/packages" className="block px-3 py-2 hover:bg-muted rounded">Packages</Link>
           <Link to="/destinations" className="block px-3 py-2 hover:bg-muted rounded">Destinations</Link>
           <Link to="/about" className="block px-3 py-2 hover:bg-muted rounded">About</Link>
           <Link to="/contact" className="block px-3 py-2 hover:bg-muted rounded">Contact</Link>

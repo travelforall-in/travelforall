@@ -32,6 +32,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Uncomment and adjust when you have a frontend build
 // app.use(express.static(path.join(__dirname, 'frontend/build')));
 
+
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));

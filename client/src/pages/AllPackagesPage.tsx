@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import PackageCard from "@/pages/PackageCard";
 import { commonService } from "@/service/commonService";
+import { useParams } from "react-router-dom";
 import Filter from "@/components/shared/Filter";
 
 export default function PackagesPage() {
+  const { destinationId } = useParams();
   const [packages, setPackages] = useState([]);
   const [availableDestinations, setAvailableDestinations] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState(0);
@@ -29,11 +31,18 @@ export default function PackagesPage() {
         ...(duration && { duration }),
         ...(sort && { sort }),
       };
-
+      if (destinationId) {
+        const response = await commonService.getItemById(
+          "packages",
+          destinationId
+        );
+        setPackages(response.data);
+      }
       const response = await commonService.getAll("packages", filters);
       setPackages(response.data.data);
-      const total = response.data.total;
-      setTotalPages(Math.ceil(total / limit) || 1);
+      console.log(response.data);
+      
+      setTotalPages(response.data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching packages:", error);
     }
@@ -103,29 +112,35 @@ export default function PackagesPage() {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">No packages found matching your filters.</p>
+          <p className="text-gray-500">
+            No packages found matching your filters.
+          </p>
         )}
 
-        {/* Pagination */}
-        <div className="mt-8 flex justify-center items-center gap-4">
-          <button
-            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            disabled={page === 1}
-            className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="text-green-800 font-semibold">
-            Page {page} of {totalPages}
-          </span>
-          <button
-            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={page === totalPages}
-            className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
+{/* Pagination */}
+<div className="mt-8 flex justify-center items-center gap-4">
+  <button
+    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+    disabled={page === 1}
+    className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+  >
+    Previous
+  </button>
+
+  <span className="text-green-800 font-semibold">
+    Page {page} of {totalPages}
+  </span>
+
+  <button
+    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+    disabled={page === totalPages}
+    className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+  >
+    Next
+  </button>
+</div>
+
+
       </main>
     </div>
   );

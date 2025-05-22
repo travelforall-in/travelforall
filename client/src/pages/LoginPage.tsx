@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { authService } from '@/service/authService';
 
 const LoginPage = () => {
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
