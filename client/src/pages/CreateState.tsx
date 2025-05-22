@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-const CreateCity = () => {
+const CreateState = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -63,14 +63,14 @@ const CreateCity = () => {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/cities/", payload, {
+      await axios.post("http://localhost:5000/api/states/", payload, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: token ? `Bearer ${token}` : "",
         },
       });
 
-      toast.success("City created successfully!");
+      toast.success("State created successfully!");
 
       setFormData({
         name: "",
@@ -88,7 +88,7 @@ const CreateCity = () => {
 
       navigate(-1);
     } catch (err) {
-      toast.error("Failed to create city");
+      toast.error("Failed to create state");
     }
   };
 
@@ -96,7 +96,7 @@ const CreateCity = () => {
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-10">
         <h2 className="text-3xl font-bold mb-8 text-gray-800">
-          Create New City
+          Create New State
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -104,7 +104,7 @@ const CreateCity = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
-                City Name
+                State Name
               </label>
               <input
                 type="text"
@@ -250,7 +250,7 @@ const CreateCity = () => {
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Upload City Images
+              Upload State Images
             </label>
             <input
               type="file"
@@ -267,7 +267,7 @@ const CreateCity = () => {
               type="submit"
               className="min-w-full md:w-auto bg-[#F97015] text-white px-6 py-3 rounded-lg hover:bg-[#ea6207] transition"
             >
-              Create City
+              Create State
             </button>
           </div>
         </form>
@@ -276,4 +276,4 @@ const CreateCity = () => {
   );
 };
 
-export default CreateCity;
+export default CreateState;

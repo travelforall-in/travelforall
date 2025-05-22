@@ -8,7 +8,7 @@ const AdminCreatePackage = () => {
     name: "",
     type: "",
     destination: "",
-    city: "",
+    state: "",
     duration: { days: 0, nights: 0 },
     price: 0,
     highlights: "",
@@ -21,21 +21,21 @@ const AdminCreatePackage = () => {
   });
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [cities, setCities] = useState<{ _id: string; name: string }[]>([]);
+  const [states, setStates] = useState<{ _id: string; name: string }[]>([]);
 
   const adminToken = localStorage.getItem("token");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCities = async () => {
+    const fetchStates = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/cities");
-        setCities(res.data.data);
+        const res = await axios.get("http://localhost:5000/api/states");
+        setStates(res.data.data);
       } catch (err) {
-        console.error("Failed to fetch cities", err);
+        console.error("Failed to fetch states", err);
       }
     };
-    fetchCities();
+    fetchStates();
   }, []);
 
   const handleChange = (
@@ -96,7 +96,7 @@ const AdminCreatePackage = () => {
     formPayload.append("name", formData.name);
     formPayload.append("type", formData.type);
     formPayload.append("destination", formData.destination);
-    formPayload.append("city", formData.city);
+    formPayload.append("state", formData.state);
 
     if (!formData.duration.days || formData.duration.days <= 0) {
       toast.error("Please enter a valid number of days.");
@@ -152,7 +152,7 @@ const AdminCreatePackage = () => {
         name: "",
         type: "",
         destination: "",
-        city: "",
+        state: "",
         duration: { days: 0, nights: 0 },
         price: 0,
         highlights: "",
@@ -227,21 +227,21 @@ const AdminCreatePackage = () => {
             />
           </div>
 
-          {/* City Dropdown */}
+          {/* state Dropdown */}
           <div>
-            <label className="block font-medium mb-1">Select City</label>
+            <label className="block font-medium mb-1">Select state</label>
             <select
-              name="city"
-              value={formData.city}
+              name="state"
+              value={formData.state}
               onChange={handleChange}
               className="border p-2 rounded-md w-full"
               required
             >
-              <option value="">Select City</option>
-              {Array.isArray(cities) &&
-                cities.map((city) => (
-                  <option key={city._id} value={city._id}>
-                    {city.name}
+              <option value="">Select state</option>
+              {Array.isArray(states) &&
+                states.map((state) => (
+                  <option key={state._id} value={state._id}>
+                    {state.name}
                   </option>
                 ))}
             </select>
