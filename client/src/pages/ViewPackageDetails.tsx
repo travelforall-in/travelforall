@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   MapPin,
   Clock,
@@ -9,7 +9,7 @@ import {
   CalendarDays,
   ArrowLeft,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import BookingForm from "./BookingPage";
 
 const ViewPackageDetails = () => {
   const { id } = useParams();
@@ -45,162 +45,137 @@ const ViewPackageDetails = () => {
         </button>
       </div>
 
-      <div className="grid gap-6">
-        {/* Section 1: Image Carousel */}
-        <div className="bg-white shadow-md rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
-          <div className="relative h-64 w-full">
-            {packageDetails.fullImageUrls?.length > 0 && (
-              <img
-                src={packageDetails.fullImageUrls[0]}
-                alt={packageDetails.name || "Package Image"}
-                className="object-cover w-full h-full"
-              />
-            )}
-            <div className="absolute bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4">
-              <h2 className="text-2xl font-semibold">
-                {packageDetails.name || "Unnamed Package"}
-              </h2>
-              <p className="text-sm">
-                {packageDetails.state?.name || "Unknown State"}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 2: Spotlight Section */}
-        <div className="bg-white shadow-md rounded-2xl p-4 hover:shadow-lg transition-shadow">
-          <h3 className="text-xl font-bold mb-4">Package Highlights</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-100 to-orange-100 hover:shadow-md transition-shadow">
-              <MapPin className="text-blue-500" />
-              <span>
-                {packageDetails.destination || "Amazing Destinations"}
-              </span>
-            </div>
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-100 to-orange-100 hover:shadow-md transition-shadow">
-              <Clock className="text-blue-500" />
-              <span>
-                {packageDetails.duration?.days || 0} Days /{" "}
-                {packageDetails.duration?.nights || 0} Nights
-              </span>
-            </div>
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-100 to-orange-100 hover:shadow-md transition-shadow">
-              <IndianRupee className="text-blue-500" />
-              <span>
-                {packageDetails.price?.toLocaleString() ||
-                  "Price not available"}
-              </span>
-            </div>
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-100 to-orange-100 hover:shadow-md transition-shadow">
-              <Hotel className="text-blue-500" />
-              <span>
-                {packageDetails.accommodation || "Accommodation not specified"}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 3: About Package */}
-        <div className="bg-white shadow-md rounded-2xl p-4 hover:shadow-lg transition-shadow">
-          <h3 className="text-xl font-bold mb-4">About the Package</h3>
-          <div>
-            <h4 className="font-semibold">Highlights:</h4>
-            <ul className="list-disc list-inside">
-              {packageDetails.highlights?.length > 0 ? (
-                packageDetails.highlights.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))
-              ) : (
-                <li>No highlights available.</li>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* LEFT SIDE: PACKAGE DETAILS */}
+        <div className="lg:col-span-2 grid gap-6">
+          {/* Image Section */}
+          <div className="bg-white shadow-md rounded-2xl overflow-hidden">
+            <div className="relative h-64 w-full">
+              {packageDetails.fullImageUrls?.[0] && (
+                <img
+                  src={packageDetails.fullImageUrls[0]}
+                  alt={packageDetails.name || "Package Image"}
+                  className="object-cover w-full h-full"
+                />
               )}
-            </ul>
-          </div>
-          <div className="mt-4">
-            <h4 className="font-semibold">Inclusions:</h4>
-            <ul className="list-disc list-inside">
-              {packageDetails.inclusions?.length > 0 ? (
-                packageDetails.inclusions.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))
-              ) : (
-                <li>No inclusions listed.</li>
-              )}
-            </ul>
-          </div>
-          <div className="mt-4">
-            <h4 className="font-semibold">Exclusions:</h4>
-            <ul className="list-disc list-inside">
-              {packageDetails.exclusions?.length > 0 ? (
-                packageDetails.exclusions.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))
-              ) : (
-                <li>No exclusions listed.</li>
-              )}
-            </ul>
-          </div>
-          <div className="mt-4">
-            <h4 className="font-semibold">Transportation:</h4>
-            <p>{packageDetails.transportation || "Not specified"}</p>
-          </div>
-        </div>
-
-        {/* Section 4: Itinerary - MODIFIED SECTION */}
-        <div className="bg-white shadow-md rounded-2xl p-4 hover:shadow-lg transition-shadow">
-          <h3 className="text-xl font-bold mb-4">Daily Itinerary</h3>
-          {packageDetails.itinerary?.length > 0 ? (
-            <ul className="list-none space-y-3">
-              {packageDetails.itinerary.map((item) => {
-                const descriptionPrefixRegex = new RegExp(
-                  `^Day\\s*${item.day}:\\s*`,
-                  "i"
-                );
-                const cleanedDescription = item.description
-                  .replace(descriptionPrefixRegex, "")
-                  .trim();
-
-                return (
-                  <li
-                    key={item._id || item.day}
-                    className="flex items-start py-1"
-                  >
-                    <CalendarDays className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0 mt-1" />
-                    <div>
-                      <strong className="font-semibold">Day {item.day}:</strong>{" "}
-                      {cleanedDescription}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p>No itinerary available.</p>
-          )}
-        </div>
-
-        {/* Section 5: Reviews */}
-        <div className="bg-white shadow-md rounded-2xl p-4 hover:shadow-lg transition-shadow">
-          <h3 className="text-xl font-bold mb-4">Reviews</h3>
-          <p className="mb-4">
-            Average Rating: {packageDetails.averageRating || 0} / 5
-          </p>
-          {packageDetails.reviews?.length > 0 ? (
-            packageDetails.reviews.map((review, index) => (
-              <div key={index} className="border-b py-2">
-                <p className="font-semibold">{review.name || "Anonymous"}</p>
-                <p className="text-sm text-yellow-500">
-                  Rating: {review.rating || 0} / 5
+              <div className="absolute bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4">
+                <h2 className="text-2xl font-semibold">{packageDetails.name}</h2>
+                <p className="text-sm">
+                  {packageDetails.state?.name || "Unknown State"}
                 </p>
-                <p>{review.comment || "No comment provided."}</p>
               </div>
-            ))
-          ) : (
-            <p>No reviews available.</p>
-          )}
+            </div>
+          </div>
+
+          {/* Highlights */}
+          <div className="bg-white shadow-md rounded-2xl p-4">
+            <h3 className="text-xl font-bold mb-4">Package Highlights</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InfoCard icon={<MapPin />} label={packageDetails.destination} />
+              <InfoCard
+                icon={<Clock />}
+                label={`${packageDetails.duration?.days || 0} Days / ${packageDetails.duration?.nights || 0} Nights`}
+              />
+              <InfoCard
+                icon={<IndianRupee />}
+                label={packageDetails.price?.toLocaleString() || "Not available"}
+              />
+              <InfoCard
+                icon={<Hotel />}
+                label={packageDetails.accommodation || "N/A"}
+              />
+            </div>
+          </div>
+
+          {/* About Package */}
+          <div className="bg-white shadow-md rounded-2xl p-4">
+            <h3 className="text-xl font-bold mb-4">About the Package</h3>
+            <SectionList title="Highlights" items={packageDetails.highlights} />
+            <SectionList title="Inclusions" items={packageDetails.inclusions} />
+            <SectionList title="Exclusions" items={packageDetails.exclusions} />
+            <div className="mt-4">
+              <h4 className="font-semibold">Transportation:</h4>
+              <p>{packageDetails.transportation || "Not specified"}</p>
+            </div>
+          </div>
+
+          {/* Itinerary */}
+          <div className="bg-white shadow-md rounded-2xl p-4">
+            <h3 className="text-xl font-bold mb-4">Daily Itinerary</h3>
+            {packageDetails.itinerary?.length > 0 ? (
+              <ul className="space-y-3">
+                {packageDetails.itinerary.map((item) => {
+                  const cleanedDescription = item.description
+                    .replace(new RegExp(`^Day\\s*${item.day}:\\s*`, "i"), "")
+                    .trim();
+
+                  return (
+                    <li key={item._id || item.day} className="flex items-start py-1">
+                      <CalendarDays className="h-5 w-5 text-blue-500 mr-3 mt-1" />
+                      <div>
+                        <strong className="font-semibold">Day {item.day}:</strong>{" "}
+                        {cleanedDescription}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p>No itinerary available.</p>
+            )}
+          </div>
+
+          {/* Reviews */}
+          <div className="bg-white shadow-md rounded-2xl p-4">
+            <h3 className="text-xl font-bold mb-4">Reviews</h3>
+            <p className="mb-4">
+              Average Rating: {packageDetails.averageRating || 0} / 5
+            </p>
+            {packageDetails.reviews?.length > 0 ? (
+              packageDetails.reviews.map((review, index) => (
+                <div key={index} className="border-b py-2">
+                  <p className="font-semibold">{review.name || "Anonymous"}</p>
+                  <p className="text-sm text-yellow-500">
+                    Rating: {review.rating || 0} / 5
+                  </p>
+                  <p>{review.comment || "No comment provided."}</p>
+                </div>
+              ))
+            ) : (
+              <p>No reviews available.</p>
+            )}
+          </div>
         </div>
+
+        {/* RIGHT SIDE: BOOKING FORM */}
+        <BookingForm
+          packageId={id}
+          price={packageDetails.price || 0}
+          navigate={navigate}
+        />
       </div>
     </div>
   );
 };
+
+const InfoCard = ({ icon, label }) => (
+  <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-blue-100 to-orange-100 hover:shadow-md transition-shadow">
+    <span className="text-blue-500">{icon}</span>
+    <span>{label}</span>
+  </div>
+);
+
+const SectionList = ({ title, items }) => (
+  <div className="mt-4">
+    <h4 className="font-semibold">{title}:</h4>
+    <ul className="list-disc list-inside">
+      {items?.length > 0 ? (
+        items.map((item, idx) => <li key={idx}>{item}</li>)
+      ) : (
+        <li>No {title.toLowerCase()} available.</li>
+      )}
+    </ul>
+  </div>
+);
 
 export default ViewPackageDetails;
