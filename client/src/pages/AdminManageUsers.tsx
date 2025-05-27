@@ -45,7 +45,7 @@ const ManageUsers: React.FC = () => {
   const handleDelete = async (_id: string) => {
     if (confirm("Are you sure you want to delete this user?")) {
       try {
-        const token = localStorage.getItem("adminToken");
+        const token = localStorage.getItem("token");
         await axios.delete(`http://localhost:5000/api/admin/users/${_id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -87,8 +87,13 @@ const ManageUsers: React.FC = () => {
         onManageUsersClick={() => navigate("/admin/manage-users")}
         onDashboardClick={() => navigate("/admin/dashboard")}
         onDestinationClick={() => navigate("/admin/destination")}
+        onBookingsClick={() => navigate("/admin/bookings")}
       />
-      <div className="flex-1 p-6 bg-gray-50 min-h-screen">
+      <div
+        className={`flex-1 p-6 bg-gray-50 min-h-screen transition-all duration-300 ${
+          isCollapsed ? "ml-20" : "ml-64"
+        }`}
+      >
         <header className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <button

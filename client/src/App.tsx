@@ -37,13 +37,13 @@ import PartnerDetails from "./Parnters/PartnerDetails";
 import Destination from "./pages/AdminDestination";
 import DomesticDestination from "./pages/AdminDestinationDomestic";
 import InternationalDestination from "./pages/AdminDestinationInternational";
-
 import StatePackages from "./pages/AdminStatePackages";
 import CreateState from "./pages/AdminCreateState";
 import ExplorePackages from "./pages/ExplorePackages";
 import FeaturedPackages from "./components/FeaturedPackages";
 import ViewPackages from "./pages/ViewPackages";
 import ViewPackageDetails from "./pages/ViewPackageDetails";
+import BookingList from "./pages/AdminBookingList";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +81,7 @@ const App = () => (
           />
           <Route path="/admin/dashboard" element={<AdminPanel />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
+          <Route path="/admin/bookings" element={<BookingList />} />
           <Route path="/admin/destination" element={<Destination />} />
           <Route
             path="/admin/destination/domestic"
