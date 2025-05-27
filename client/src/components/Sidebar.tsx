@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   MapPin,
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Sidebar = ({
   isCollapsed,
@@ -14,6 +15,7 @@ const Sidebar = ({
   onManageUsersClick,
   onDashboardClick,
   onDestinationClick,
+  onBookingsClick,
 }: {
   isCollapsed: boolean;
   onLogout: () => void;
@@ -21,11 +23,12 @@ const Sidebar = ({
   onManageUsersClick: () => void;
   onDashboardClick: () => void;
   onDestinationClick: () => void;
+  onBookingsClick: () => void;
 }) => (
   <aside
-    className={`bg-zinc-200 ${
+    className={`bg-zinc-200 fixed top-0 left-0 h-screen z-30 ${
       isCollapsed ? "w-20" : "w-64"
-    } transition-all duration-300 min-h-screen p-4 relative`}
+    } transition-all duration-300 p-4`}
   >
     <h1
       className={`text-2xl text-[#097C70] font-bold mt-5 mb-8 ${
@@ -35,42 +38,61 @@ const Sidebar = ({
       Admin Panel
     </h1>
     <nav className="flex flex-col gap-6">
-      <button
-        className="text-black flex items-center gap-2 hover:text-[#097C70]"
+      <motion.button
+        whileHover={{ scale: 1.05, x: 5 }}
+        transition={{ type: "spring", stiffness: 300 }}
+        className="text-black flex items-center gap-2 hover:text-[#f1f2f3] hover:bg-[#087d71] px-3 py-2 rounded-md"
         onClick={onDashboardClick}
       >
         <LayoutDashboard size={20} /> {!isCollapsed && "Dashboard"}
-      </button>
-      <button
-        className="text-black flex items-center gap-2 hover:text-[#097C70]"
+      </motion.button>
+
+      <motion.button
+        whileHover={{ scale: 1.05, x: 5 }}
+        transition={{ type: "spring", stiffness: 300 }}
+        className="text-black flex items-center gap-2 hover:text-[#f1f2f3] hover:bg-[#087d71] px-3 py-2 rounded-md"
         onClick={onManageUsersClick}
       >
         <Users size={20} /> {!isCollapsed && "Users"}
-      </button>
-      <button className="text-black flex items-center gap-2 hover:text-[#097C70]">
+      </motion.button>
+
+      <motion.button
+        whileHover={{ scale: 1.05, x: 5 }}
+        transition={{ type: "spring", stiffness: 300 }}
+        className="text-black flex items-center gap-2 hover:text-[#f1f2f3] hover:bg-[#087d71] px-3 py-2 rounded-md"
+        onClick={onBookingsClick}
+      >
         <ChartBar size={20} /> {!isCollapsed && "Bookings"}
-      </button>
-      <button
-        className="text-black flex items-center gap-2 hover:text-[#097C70]"
+      </motion.button>
+
+      <motion.button
+        whileHover={{ scale: 1.05, x: 5 }}
+        transition={{ type: "spring", stiffness: 300 }}
+        className="text-black flex items-center gap-2 hover:text-[#f1f2f3] hover:bg-[#087d71] px-3 py-2 rounded-md"
         onClick={onDestinationClick}
       >
         <MapPin size={20} /> {!isCollapsed && "Destination"}
-      </button>
-      <button
-        className="text-black flex items-center gap-2 hover:text-[#097C70]"
+      </motion.button>
+
+      <motion.button
+        whileHover={{ scale: 1.05, x: 5 }}
+        transition={{ type: "spring", stiffness: 300 }}
+        className="text-black flex items-center gap-2 hover:text-[#f1f2f3] hover:bg-[#087d71] px-3 py-2 rounded-md"
         onClick={onPackageClick}
       >
-        <Package size={20} />
-        {!isCollapsed && "Packages"}
-      </button>
+        <Package size={20} /> {!isCollapsed && "Packages"}
+      </motion.button>
     </nav>
+
     <div className="absolute bottom-5">
-      <button
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 300 }}
         className="flex items-center gap-2 text-white bg-red-600 px-3 py-2 rounded-lg"
         onClick={onLogout}
       >
         <LogOut size={20} /> {!isCollapsed && "Logout"}
-      </button>
+      </motion.button>
     </div>
   </aside>
 );

@@ -45,28 +45,29 @@ const ViewPackageDetails = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* LEFT SIDE: PACKAGE DETAILS */}
-        <div className="lg:col-span-2 grid gap-6">
-          {/* Image Section */}
-          <div className="bg-white shadow-md rounded-2xl overflow-hidden">
-            <div className="relative h-64 w-full">
-              {packageDetails.fullImageUrls?.[0] && (
-                <img
-                  src={packageDetails.fullImageUrls[0]}
-                  alt={packageDetails.name || "Package Image"}
-                  className="object-cover w-full h-full"
-                />
-              )}
-              <div className="absolute bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4">
-                <h2 className="text-2xl font-semibold">{packageDetails.name}</h2>
-                <p className="text-sm">
-                  {packageDetails.state?.name || "Unknown State"}
-                </p>
-              </div>
-            </div>
+      {/* IMAGE SECTION */}
+      <div className="bg-white shadow-md rounded-2xl overflow-hidden mb-6">
+        <div className="relative h-64 w-full">
+          {packageDetails.fullImageUrls?.[0] && (
+            <img
+              src={packageDetails.fullImageUrls[0]}
+              alt={packageDetails.name || "Package Image"}
+              className="object-cover w-full h-full"
+            />
+          )}
+          <div className="absolute bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4">
+            <h2 className="text-2xl font-semibold">{packageDetails.name}</h2>
+            <p className="text-sm">
+              {packageDetails.state?.name || "Unknown State"}
+            </p>
           </div>
+        </div>
+      </div>
 
+      {/* MAIN CONTENT: HIGHLIGHTS + BOOKING FORM */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* LEFT: Highlights + other sections */}
+        <div className="lg:col-span-2 grid gap-6">
           {/* Highlights */}
           <div className="bg-white shadow-md rounded-2xl p-4">
             <h3 className="text-xl font-bold mb-4">Package Highlights</h3>
@@ -74,11 +75,15 @@ const ViewPackageDetails = () => {
               <InfoCard icon={<MapPin />} label={packageDetails.destination} />
               <InfoCard
                 icon={<Clock />}
-                label={`${packageDetails.duration?.days || 0} Days / ${packageDetails.duration?.nights || 0} Nights`}
+                label={`${packageDetails.duration?.days || 0} Days / ${
+                  packageDetails.duration?.nights || 0
+                } Nights`}
               />
               <InfoCard
                 icon={<IndianRupee />}
-                label={packageDetails.price?.toLocaleString() || "Not available"}
+                label={
+                  packageDetails.price?.toLocaleString() || "Not available"
+                }
               />
               <InfoCard
                 icon={<Hotel />}
@@ -110,10 +115,15 @@ const ViewPackageDetails = () => {
                     .trim();
 
                   return (
-                    <li key={item._id || item.day} className="flex items-start py-1">
+                    <li
+                      key={item._id || item.day}
+                      className="flex items-start py-1"
+                    >
                       <CalendarDays className="h-5 w-5 text-blue-500 mr-3 mt-1" />
                       <div>
-                        <strong className="font-semibold">Day {item.day}:</strong>{" "}
+                        <strong className="font-semibold">
+                          Day {item.day}:
+                        </strong>{" "}
                         {cleanedDescription}
                       </div>
                     </li>
@@ -147,12 +157,10 @@ const ViewPackageDetails = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE: BOOKING FORM */}
-        <BookingForm
-          packageId={id}
-          price={packageDetails.price || 0}
-          navigate={navigate}
-        />
+        {/* RIGHT: Booking Form */}
+        <div>
+          <BookingForm packageId={id} price={packageDetails.price || 0} />
+        </div>
       </div>
     </div>
   );
