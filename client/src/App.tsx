@@ -44,6 +44,11 @@ import FeaturedPackages from "./components/FeaturedPackages";
 import ViewPackages from "./pages/ViewPackages";
 import ViewPackageDetails from "./pages/ViewPackageDetails";
 import BookingList from "./pages/AdminBookingList";
+import CustomPackageForm from "./pages/CustomPackageForm";
+import UserCustomPackage from "./pages/UserCustomPackage";
+
+
+
 
 const queryClient = new QueryClient();
 
@@ -75,6 +80,10 @@ const App = () => (
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/packages/:id" element={<ViewPackages />} />
+
+          {<Route path="/custom-packages-form" element={<CustomPackageForm />} />}
+          <Route path="/custom-packages" element={<UserCustomPackage />} />
+
           <Route
             path="/packages/:id/details"
             element={<ViewPackageDetails />}
@@ -112,6 +121,7 @@ const App = () => (
           </Route>
 
           <Route path="*" element={<NotFound />} />
+          
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
