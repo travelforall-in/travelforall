@@ -118,6 +118,12 @@ const BookingList: React.FC = () => {
             </button>
             <h2 className="text-2xl font-bold">All Bookings</h2>
           </div>
+          <button
+            onClick={() => navigate("/admin/manage-bookings")}
+            className="bg-[#F97015] px-3 py-2 rounded-md text-white hover:bg-[#ea6207]"
+          >
+            Manage Bookings
+          </button>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           {paginatedBookings.map((booking) => (
