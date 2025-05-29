@@ -44,10 +44,13 @@ import FeaturedPackages from "./components/FeaturedPackages";
 import ViewPackages from "./pages/ViewPackages";
 import ViewPackageDetails from "./pages/ViewPackageDetails";
 import BookingList from "./pages/AdminBookingList";
+
 import CustomPackageForm from "./pages/CustomPackageForm";
 import UserCustomPackage from "./pages/UserCustomPackage";
 
 
+
+import ManageBookings from "./pages/AdminManageBookings";
 
 
 const queryClient = new QueryClient();
@@ -91,6 +94,7 @@ const App = () => (
           <Route path="/admin/dashboard" element={<AdminPanel />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
           <Route path="/admin/bookings" element={<BookingList />} />
+          <Route path="/admin/manage-bookings" element={<ManageBookings />} />
           <Route path="/admin/destination" element={<Destination />} />
           <Route
             path="/admin/destination/domestic"
