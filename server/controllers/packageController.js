@@ -12,7 +12,7 @@ exports.createPackage = async (req, res) => {
   try {
     // Handle multiple image uploads
     const imageFiles = req.files;
-    
+
     // Prepare package data
     const packageData = { ...req.body };
 
@@ -23,9 +23,9 @@ exports.createPackage = async (req, res) => {
 
     // Parse JSON-like string fields
     const fieldsToParseAsJSON = [
-      'highlights', 
-      'inclusions', 
-      'exclusions', 
+      'highlights',
+      'inclusions',
+      'exclusions',
       'itinerary'
     ];
 
@@ -51,16 +51,62 @@ exports.createPackage = async (req, res) => {
     if (packageData.price) packageData.price = parseFloat(packageData.price);
     packageData.featured = packageData.featured === 'true';
 
+    // Validate city only if it's provided
+    if (packageData.city) {
+      const City = require('../models/City');
+      const cityExists = await City.findById(packageData.city);
+
+      if (!cityExists) {
+        return res.status(404).json({
+          success: false,
+          message: 'City not found with the provided ID',
+        });
+      }
+
+      // If destination is not provided but city is, use city name as destination
+      if (!packageData.destination) {
+        packageData.destination = cityExists.name;
+      }
+
+      // If type is not provided, use city type
+      if (!packageData.type) {
+        packageData.type = cityExists.type;
+      }
+    }
+
+    // Validate state exists if provided
+    if (packageData.state) {
+      const State = require('../models/State');
+      const stateExists = await State.findById(packageData.state);
+
+      if (!stateExists) {
+        return res.status(404).json({
+          success: false,
+          message: 'State not found with the provided ID',
+        });
+      }
+
+      // If type is not provided, use state type
+      if (!packageData.type) {
+        packageData.type = stateExists.type;
+      }
+    }
+
     // Create package
     const newPackage = await Package.create(packageData);
-    
+
+    // Populate city information for the response if city exists
+    if (newPackage.city) {
+      await newPackage.populate('city');
+    }
+
     res.status(201).json({
       success: true,
       data: newPackage,
     });
   } catch (error) {
     console.error('Error creating package:', error);
-    
+
     // Clean up uploaded files if package creation fails
     if (req.files) {
       req.files.forEach(file => {
@@ -70,7 +116,7 @@ exports.createPackage = async (req, res) => {
         }
       });
     }
-    
+
     res.status(500).json({
       success: false,
       message: 'Server error',
@@ -85,69 +131,81 @@ exports.createPackage = async (req, res) => {
 exports.getPackages = async (req, res) => {
   try {
     const query = {};
-    
+
     // Filter by type if provided
     if (req.query.type) {
       query.type = req.query.type;
     }
-    
+
     // Filter by price range if provided
     if (req.query.minPrice && req.query.maxPrice) {
-      query.price = { 
-        $gte: parseFloat(req.query.minPrice), 
-        $lte: parseFloat(req.query.maxPrice) 
+      query.price = {
+        $gte: parseFloat(req.query.minPrice),
+        $lte: parseFloat(req.query.maxPrice)
       };
     } else if (req.query.minPrice) {
       query.price = { $gte: parseFloat(req.query.minPrice) };
     } else if (req.query.maxPrice) {
       query.price = { $lte: parseFloat(req.query.maxPrice) };
     }
-    
+
     // Filter by destination if provided
     if (req.query.destination) {
       query.destination = { $regex: req.query.destination, $options: 'i' };
     }
-    
+
+    // Filter by city if provided
+    if (req.query.city) {
+      query.city = req.query.city;
+    }
+
+    // Filter by state if provided
+    if (req.query.state) {
+      query.state = req.query.state;
+    }
+
     // Filter by duration if provided
     if (req.query.duration) {
       query['duration.days'] = { $lte: parseInt(req.query.duration) };
     }
-    
+
     // Sorting
-    const sortOptions = req.query.sort 
+    const sortOptions = req.query.sort
       ? req.query.sort.split(',').join(' ')
       : '-createdAt';
-    
+
     // Pagination
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 10;
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-    
-    // Execute query
+
+    // Execute query with city and state population
     const total = await Package.countDocuments(query);
     const packages = await Package.find(query)
+      .populate('city', 'name country type')
+      .populate('state', 'name country type')
       .sort(sortOptions)
       .skip(startIndex)
       .limit(limit);
-    
+
     // Pagination result
     const pagination = {};
-    
+
     if (endIndex < total) {
       pagination.next = {
         page: page + 1,
         limit,
       };
     }
-    
+
     if (startIndex > 0) {
       pagination.prev = {
         page: page - 1,
         limit,
       };
     }
-    
+
     res.status(200).json({
       success: true,
       count: packages.length,
@@ -170,18 +228,31 @@ exports.getPackages = async (req, res) => {
 // @access  Public
 exports.getPackage = async (req, res) => {
   try {
-    const package = await Package.findById(req.params.id);
-    
+    const packageId = req.params.id;
+
+    // Validate package ID (extra safeguard)
+    if (!mongoose.Types.ObjectId.isValid(packageId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid package ID format'
+      });
+    }
+
+    // Fetch package with city and state information
+    const package = await Package.findById(packageId)
+      .populate('city')
+      .populate('state');
+
     if (!package) {
       return res.status(404).json({
         success: false,
-        message: 'Package not found',
+        message: 'Package not found'
       });
     }
-    
+
     res.status(200).json({
       success: true,
-      data: package,
+      data: package
     });
   } catch (error) {
     console.error('Get Package Error:', error);
@@ -199,7 +270,7 @@ exports.getPackage = async (req, res) => {
 exports.updatePackage = async (req, res) => {
   try {
     let package = await Package.findById(req.params.id);
-    
+
     if (!package) {
       return res.status(404).json({
         success: false,
@@ -212,7 +283,7 @@ exports.updatePackage = async (req, res) => {
 
     // Handle multiple image uploads
     const imageFiles = req.files;
-    
+
     // If new images were uploaded, add their paths to the package
     if (imageFiles && imageFiles.length > 0) {
       // Remove old image files if they exist
@@ -231,9 +302,9 @@ exports.updatePackage = async (req, res) => {
 
     // Parse JSON-like string fields
     const fieldsToParseAsJSON = [
-      'highlights', 
-      'inclusions', 
-      'exclusions', 
+      'highlights',
+      'inclusions',
+      'exclusions',
       'itinerary'
     ];
 
@@ -258,17 +329,17 @@ exports.updatePackage = async (req, res) => {
     // Convert primitive fields
     if (updateData.price) updateData.price = parseFloat(updateData.price);
     updateData.featured = updateData.featured === 'true';
-    
+
     // Update package
     package = await Package.findByIdAndUpdate(
-      req.params.id, 
-      updateData, 
+      req.params.id,
+      updateData,
       {
         new: true,
         runValidators: true,
       }
     );
-    
+
     res.status(200).json({
       success: true,
       data: package,
@@ -289,14 +360,14 @@ exports.updatePackage = async (req, res) => {
 exports.deletePackage = async (req, res) => {
   try {
     const package = await Package.findById(req.params.id);
-    
+
     if (!package) {
       return res.status(404).json({
         success: false,
         message: 'Package not found',
       });
     }
-    
+
     // Remove associated image files
     if (package.images && package.images.length > 0) {
       package.images.forEach(imagePath => {
@@ -306,9 +377,9 @@ exports.deletePackage = async (req, res) => {
         }
       });
     }
-    
+
     await Package.findByIdAndDelete(req.params.id);
-    
+
     res.status(200).json({
       success: true,
       data: {},
@@ -329,41 +400,41 @@ exports.deletePackage = async (req, res) => {
 exports.addReview = async (req, res) => {
   try {
     const package = await Package.findById(req.params.id);
-    
+
     if (!package) {
       return res.status(404).json({
         success: false,
         message: 'Package not found',
       });
     }
-    
+
     const { rating, comment } = req.body;
-    
+
     // Check if the user has already reviewed this package
     const alreadyReviewed = package.reviews.find(
       (r) => r.user.toString() === req.user._id.toString()
     );
-    
+
     if (alreadyReviewed) {
       return res.status(400).json({
         success: false,
         message: 'Package already reviewed',
       });
     }
-    
+
     const review = {
       user: req.user._id,
       rating: Number(rating),
       comment,
     };
-    
+
     package.reviews.push(review);
-    
+
     // Calculate average rating
     package.calculateAverageRating();
-    
+
     await package.save();
-    
+
     res.status(201).json({
       success: true,
       message: 'Review added',
@@ -384,7 +455,7 @@ exports.addReview = async (req, res) => {
 exports.getFeaturedPackages = async (req, res) => {
   try {
     const featuredPackages = await Package.find({ featured: true }).limit(6);
-    
+
     res.status(200).json({
       success: true,
       count: featuredPackages.length,
@@ -406,14 +477,14 @@ exports.getFeaturedPackages = async (req, res) => {
 exports.getPackagesByType = async (req, res) => {
   try {
     const { type } = req.params;
-    
+
     if (type !== 'domestic' && type !== 'international' && type !== 'custom') {
       return res.status(400).json({
         success: false,
         message: 'Type must be either domestic, international, or custom',
       });
     }
-    
+
     // If type is 'custom', redirect to custom package endpoint
     if (type === 'custom') {
       return res.status(200).json({
@@ -421,9 +492,9 @@ exports.getPackagesByType = async (req, res) => {
         message: 'For custom packages, please use the /api/custom-packages endpoint',
       });
     }
-    
+
     const packages = await Package.find({ type });
-    
+
     res.status(200).json({
       success: true,
       count: packages.length,
@@ -439,47 +510,75 @@ exports.getPackagesByType = async (req, res) => {
   }
 };
 
-// @desc    Search packages
+// @desc    Search packages by name, city, or type
 // @route   GET /api/packages/search
 // @access  Public
 exports.searchPackages = async (req, res) => {
   try {
-    const { keyword, minPrice, maxPrice, type, duration } = req.query;
-    
+    const { keyword, type, minPrice, maxPrice, duration, city, cityId } = req.query;
+
     const query = {};
-    
-    // Search by keyword in name or destination
-    if (keyword) {
+
+    // Search by city ID if provided
+    if (cityId) {
+      query.city = cityId;
+    }
+
+    // Search by city name if provided and not searching by city ID
+    if (city && !cityId) {
+      // First, find cities that match the name
+      const City = require('../models/City');
+      const cities = await City.find({
+        name: { $regex: city, $options: 'i' }
+      }).select('_id');
+
+      if (cities.length > 0) {
+        // If cities found, search packages with those city IDs
+        query.city = { $in: cities.map(c => c._id) };
+      } else {
+        // If no cities found, search in destination field as fallback
+        query.destination = { $regex: city, $options: 'i' };
+      }
+    }
+
+    // Search by keyword in name or destination if no specific city
+    if (keyword && !city && !cityId) {
       query.$or = [
         { name: { $regex: keyword, $options: 'i' } },
         { destination: { $regex: keyword, $options: 'i' } },
       ];
+    } else if (keyword) {
+      // If city is specified, only search by name
+      query.name = { $regex: keyword, $options: 'i' };
     }
-    
-    // Filter by type
+
+    // Exact match for package type
     if (type) {
       query.type = type;
     }
-    
+
     // Filter by price range
     if (minPrice && maxPrice) {
-      query.price = { 
-        $gte: parseFloat(minPrice), 
-        $lte: parseFloat(maxPrice) 
+      query.price = {
+        $gte: parseFloat(minPrice),
+        $lte: parseFloat(maxPrice)
       };
     } else if (minPrice) {
       query.price = { $gte: parseFloat(minPrice) };
     } else if (maxPrice) {
       query.price = { $lte: parseFloat(maxPrice) };
     }
-    
+
     // Filter by duration
     if (duration) {
       query['duration.days'] = { $lte: parseInt(duration) };
     }
-    
-    const packages = await Package.find(query).sort('-createdAt');
-    
+
+    const packages = await Package.find(query)
+      .populate('city', 'name country type')
+      .populate('state', 'name country type')
+      .sort('-createdAt');
+
     res.status(200).json({
       success: true,
       count: packages.length,
@@ -501,9 +600,9 @@ exports.searchPackages = async (req, res) => {
 exports.getMostPopularPackages = async (req, res) => {
   try {
     const { sortBy = 'bookings', limit = 5 } = req.query;
-    
+
     let popularPackages;
-    
+
     if (sortBy === 'ratings') {
       // Get packages sorted by highest average rating
       popularPackages = await Package.find({
@@ -518,7 +617,7 @@ exports.getMostPopularPackages = async (req, res) => {
         .sort({ bookingsCount: -1 })
         .limit(parseInt(limit));
     }
-    
+
     res.status(200).json({
       success: true,
       count: popularPackages.length,
@@ -533,8 +632,6 @@ exports.getMostPopularPackages = async (req, res) => {
     });
   }
 };
-
-// ---------- CUSTOM PACKAGE AND WISHLIST FUNCTIONS ----------
 
 // @desc    Create custom package request
 // @route   POST /api/packages/custom
@@ -639,7 +736,7 @@ exports.getCustomPackage = async (req, res) => {
 exports.addToWishlist = async (req, res) => {
   try {
     const packageId = req.params.id;
-    
+
     // Validate package ID
     if (!mongoose.Types.ObjectId.isValid(packageId)) {
       return res.status(400).json({
@@ -647,7 +744,7 @@ exports.addToWishlist = async (req, res) => {
         message: 'Invalid package ID'
       });
     }
-    
+
     // Validate package exists
     const packageExists = await Package.findById(packageId);
     if (!packageExists) {
@@ -659,7 +756,7 @@ exports.addToWishlist = async (req, res) => {
 
     // Find user's wishlist or create if doesn't exist
     let wishlist = await Wishlist.findOne({ user: req.user._id });
-    
+
     if (!wishlist) {
       wishlist = await Wishlist.create({
         user: req.user._id,
@@ -673,7 +770,7 @@ exports.addToWishlist = async (req, res) => {
           message: 'Package already in wishlist'
         });
       }
-      
+
       // Add to wishlist
       wishlist.packages.push(packageId);
       await wishlist.save();
@@ -733,7 +830,7 @@ exports.getWishlist = async (req, res) => {
 exports.removeFromWishlist = async (req, res) => {
   try {
     const packageId = req.params.id;
-    
+
     // Validate package ID
     if (!mongoose.Types.ObjectId.isValid(packageId)) {
       return res.status(400).json({
@@ -741,33 +838,33 @@ exports.removeFromWishlist = async (req, res) => {
         message: 'Invalid package ID'
       });
     }
-    
+
     // Find user's wishlist
     const wishlist = await Wishlist.findOne({ user: req.user._id });
-    
+
     if (!wishlist) {
       return res.status(404).json({
         success: false,
         message: 'Wishlist not found'
       });
     }
-    
+
     // Check if package in wishlist
     const packageIndex = wishlist.packages.findIndex(
       id => id.toString() === packageId
     );
-    
+
     if (packageIndex === -1) {
       return res.status(400).json({
         success: false,
         message: 'Package not in wishlist'
       });
     }
-    
+
     // Remove from wishlist
     wishlist.packages.splice(packageIndex, 1);
     await wishlist.save();
-    
+
     res.status(200).json({
       success: true,
       message: 'Package removed from wishlist',
@@ -783,36 +880,178 @@ exports.removeFromWishlist = async (req, res) => {
   }
 };
 
-// @desc    Get single package
-// @route   GET /api/packages/:id
+// @desc    Get packages by city
+// @route   GET /api/packages/city/:cityName
 // @access  Public
-exports.getPackage = async (req, res) => {
+exports.getPackagesByCity = async (req, res) => {
   try {
-    const packageId = req.params.id;
-    
-    // Validate package ID (extra safeguard)
-    if (!mongoose.Types.ObjectId.isValid(packageId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid package ID format'
-      });
-    }
-    
-    const package = await Package.findById(packageId);
-    
-    if (!package) {
-      return res.status(404).json({
-        success: false,
-        message: 'Package not found'
-      });
-    }
-    
+    const { cityName } = req.params;
+
+    // Find packages that have this city as destination
+    const packages = await Package.find({
+      destination: { $regex: new RegExp(cityName, 'i') }
+    });
+
     res.status(200).json({
       success: true,
-      data: package
+      count: packages.length,
+      data: packages,
     });
   } catch (error) {
-    console.error('Get Package Error:', error);
+    console.error('Get Packages by City Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get all domestic city names
+// @route   GET /api/packages/cities/domestic
+// @access  Public
+exports.getDomesticCities = async (req, res) => {
+  try {
+    // Find all domestic packages and extract unique city names
+    const domesticPackages = await Package.find({ type: 'domestic' })
+      .select('destination')
+      .lean();
+
+    // Extract and deduplicate city names
+    const cityNames = [...new Set(domesticPackages.map(pkg => pkg.destination))];
+
+    // Sort alphabetically
+    cityNames.sort();
+
+    res.status(200).json({
+      success: true,
+      count: cityNames.length,
+      data: cityNames,
+    });
+  } catch (error) {
+    console.error('Get Domestic Cities Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get all international country names
+// @route   GET /api/packages/countries/international
+// @access  Public
+exports.getInternationalCountries = async (req, res) => {
+  try {
+    // Find all international packages and extract unique country names
+    const internationalPackages = await Package.find({ type: 'international' })
+      .select('destination')
+      .lean();
+
+    // Extract and deduplicate country names
+    const countryNames = [...new Set(internationalPackages.map(pkg => pkg.destination))];
+
+    // Sort alphabetically
+    countryNames.sort();
+
+    res.status(200).json({
+      success: true,
+      count: countryNames.length,
+      data: countryNames,
+    });
+  } catch (error) {
+    console.error('Get International Countries Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get packages by state
+// @route   GET /api/packages/state/:stateId
+// @access  Public
+// packageController.js
+exports.getPackagesByState = async (req, res) => {
+  try {
+    const { stateId } = req.params;
+
+    // Validate state ID
+    if (!mongoose.Types.ObjectId.isValid(stateId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid state ID format'
+      });
+    }
+
+    // Find packages with this state
+    const packages = await Package.find({ state: stateId })
+      .populate('city', 'name country type')
+      .populate('state', 'name country type');
+
+    res.status(200).json({
+      success: true,
+      count: packages.length,
+      data: packages,
+    });
+  } catch (error) {
+    console.error('Get Packages by State Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+
+// @desc    Get all domestic state names
+// @route   GET /api/packages/states/domestic
+// @access  Public
+exports.getDomesticStates = async (req, res) => {
+  try {
+    // Find all states with type domestic
+    const State = require('../models/State');
+    const domesticStates = await State.find({ type: 'domestic' })
+      .select('name country')
+      .sort('name')
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: domesticStates.length,
+      data: domesticStates,
+    });
+  } catch (error) {
+    console.error('Get Domestic States Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get all international state names
+// @route   GET /api/packages/states/international
+// @access  Public
+exports.getInternationalStates = async (req, res) => {
+  try {
+    // Find all states with type international
+    const State = require('../models/State');
+    const internationalStates = await State.find({ type: 'international' })
+      .select('name country')
+      .sort('name')
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: internationalStates.length,
+      data: internationalStates,
+    });
+  } catch (error) {
+    console.error('Get International States Error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',

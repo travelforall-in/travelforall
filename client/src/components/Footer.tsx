@@ -23,7 +23,7 @@ const Footer = () => {
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://www.instagram.com/_schoolforall_?igsh=MXB3dzZyamJoaTJscw==" className="text-gray-400 hover:text-white transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -49,7 +49,7 @@ const Footer = () => {
                 <Link to="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link>
+                <Link to="/Contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link>
               </li>
             </ul>
           </div>
@@ -82,11 +82,11 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 mr-2 mt-0.5 text-gray-400" />
-                <span className="text-gray-400">123 Travel Street, Tourism City, TC 12345</span>
+                <span className="text-gray-400">Gate No.1230 SH.No.1, 2, 3 & 4, Ground Floor, Near Hiras Nagar Police Station, Hiras Nagar Society, Pirangut, Pune-412215, Maharashtra, India.</span>
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 mr-2 text-gray-400" />
-                <span className="text-gray-400">+1 (555) 123-4567</span>
+                <span className="text-gray-400">+91 (913) 085-4236</span>
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 mr-2 text-gray-400" />
