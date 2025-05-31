@@ -1,21 +1,37 @@
+// const mongoose = require('mongoose');
+
+// const wishlistSchema = new mongoose.Schema({
+//   user: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: 'User',
+//     required: true
+//   },
+//   packages: [
+//     {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: 'Package'
+//     }
+//   ]
+// }, { timestamps: true });
+
+// module.exports = mongoose.model('Wishlist', wishlistSchema);
+
+
+
 const mongoose = require('mongoose');
 
-const WishlistSchema = new mongoose.Schema({
+const wishlistSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
   packages: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Package'
-    }
+      ref: 'Package',
+    },
   ],
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+}, { timestamps: true });
 
-module.exports = mongoose.model('Wishlist', WishlistSchema);
+module.exports = mongoose.model('Wishlist', wishlistSchema);

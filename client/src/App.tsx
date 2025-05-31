@@ -44,6 +44,8 @@ import ExplorePackages from "./pages/ExplorePackages";
 import FeaturedPackages from "./components/FeaturedPackages";
 import ViewPackages from "./pages/ViewPackages";
 import ViewPackageDetails from "./pages/ViewPackageDetails";
+import PageWishlist from "./pages/PageWishlist";
+import WishlistPackageCard from "./pages/WishlistPackageCard";
 
 const queryClient = new QueryClient();
 
@@ -69,12 +71,14 @@ const App = () => (
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/payment-history" element={<PaymentHistory />} />
           <Route path="/my-packages" element={<MyPackages />} />
-          <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/wishlist1" element={<WishlistPage />} />
           <Route path="/destinations/:type" element={<Domestic />} />
           <Route path="/booking/:packageId" element={<BookingPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/packages/:id" element={<ViewPackages />} />
+          <Route path="/wishlist" element={<PageWishlist />} />
+          <Route path="/wishlist/:packageId" element={<WishlistPackageCard />} />
           <Route
             path="/packages/:id/details"
             element={<ViewPackageDetails />}
