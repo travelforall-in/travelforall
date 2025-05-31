@@ -80,7 +80,13 @@ const App = () => (
           <Route path="/booking/:packageId" element={<BookingPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
-          <Route path="/packages/:id" element={<ViewPackages />} />
+          <Route path="/packages/:id" element={<ViewPack
+
+      
+
+           <Route path="/custom-packages/add" element={<CustomPackageForm />} />
+           <Route path="/custom-packages" element={<UserCustomPackage />} />
+
           <Route
             path="/packages/:id/details"
             element={<ViewPackageDetails />}

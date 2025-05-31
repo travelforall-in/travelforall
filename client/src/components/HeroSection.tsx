@@ -101,7 +101,7 @@ const HeroSection = () => {
 
       <div className=" relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="mb-16">
-          <div className="max-w-3xl animate-fadeIn">
+          <div className="max-w-3xl animate-fadeIn space-x-4">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
               Discover Your Perfect <span className="text-coral-500">Destination</span>
             </h1>
@@ -113,7 +113,9 @@ const HeroSection = () => {
                 Explore Packages
               </Button>
             </Link>
-            <Link to="/custom-packages-form">
+
+            
+            <Link to="/custom-packages">
               <Button className="bg-secondary hover:bg-secondary/90 text-white font-semibold" size="lg">
                  Create Your Package
               </Button>
