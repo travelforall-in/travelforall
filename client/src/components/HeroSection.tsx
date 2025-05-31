@@ -99,7 +99,7 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/70" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div className=" relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="mb-16">
           <div className="max-w-3xl animate-fadeIn">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
@@ -111,6 +111,11 @@ const HeroSection = () => {
             <Link to="/all-packages">
               <Button className="bg-secondary hover:bg-secondary/90 text-white font-semibold" size="lg">
                 Explore Packages
+              </Button>
+            </Link>
+            <Link to="/custom-packages-form">
+              <Button className="bg-secondary hover:bg-secondary/90 text-white font-semibold" size="lg">
+                 Create Your Package
               </Button>
             </Link>
           </div>

@@ -53,8 +53,13 @@ const DomesticDestination = () => {
         onManageUsersClick={() => navigate("/admin/manage-users")}
         onDashboardClick={() => navigate("/admin/dashboard")}
         onDestinationClick={() => navigate("/admin/destination")}
+        onBookingsClick={() => navigate("/admin/bookings")}
       />
-      <div className="flex-1 p-6 bg-gray-50 min-h-screen">
+      <div
+        className={`flex-1 p-6 bg-gray-50 min-h-screen transition-all duration-300 ${
+          isCollapsed ? "ml-20" : "ml-64"
+        }`}
+      >
         <header className="flex items-center gap-4 mb-6">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}

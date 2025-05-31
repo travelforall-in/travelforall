@@ -8,19 +8,23 @@ const PartnerDetails = () => {
       <div className="bg-white shadow-xl rounded-2xl p-8 max-w-2xl w-full">
         <img
           src={PartnerLogo}
-          alt="Partner Logo"
+          alt="OCEANLUX"
           className="h-24 w-24 object-cover rounded-lg mx-auto mb-6"
         />
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">XYZ Travels</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">OCEANLUX</h1>
         <p className="text-gray-600 text-md text-center mb-6">
-          XYZ Travels is one of the most reliable partners, offering top-quality travel packages for domestic and international destinations. With over 20 years of experience, their service guarantees a memorable journey.
+          OCEANLUX is a revolutionary air purifier using advanced artificial photosynthesis 
+          to absorb CO₂ and release fresh oxygen through microalgae. It purifies air while 
+          contributing to a greener environment, making your space healthier and more 
+          sustainable.
         </p>
 
         <ul className="text-gray-700 mb-6 list-disc pl-6 space-y-2">
-          <li>Customized tour packages</li>
-          <li>Affordable rates</li>
-          <li>24/7 customer support</li>
-          <li>Trusted by over 50K travelers</li>
+          <li><strong>Artificial Photosynthesis Technology:</strong> Converts CO₂ into oxygen using microalgae.</li>
+          <li><strong>Continuous Air Purification:</strong> Works 24/7 to keep your indoor air clean and fresh.</li>
+          <li><strong>Energy-Efficient Design:</strong> LED lighting promotes microalgae growth with minimal energy usage.</li>
+          <li><strong>Health Benefits:</strong> Reduces CO₂ levels to improve concentration, reduce fatigue, and enhance well-being.</li>
+          <li><strong>Eco-Friendly:</strong> Supports sustainable living and aligns with green building standards.</li>
         </ul>
 
         <div className="text-center">
