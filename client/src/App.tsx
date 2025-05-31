@@ -74,25 +74,29 @@ const App = () => (
           <Route path="/account-settings" element={<AccountSettings />} />
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/payment-history" element={<PaymentHistory />} />
-          <Route path="/my-packages" element={<MyPackages />} />
+          <Route path="/my-packages" element={<MyPackages userId="" />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/destinations/:type" element={<Domestic />} />
-          <Route path="/booking/:packageId" element={<BookingPage />} />
+          <Route
+            path="/booking/:packageId"
+            element={<BookingPage packageId={""} price={""} />}
+          />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
-          <Route path="/packages/:id" element={<ViewPack
+          <Route path="/packages/:id" element={<ViewPackages />} />
 
-      
-
-           <Route path="/custom-packages/add" element={<CustomPackageForm />} />
-           <Route path="/custom-packages" element={<UserCustomPackage />} />
+          <Route path="/custom-packages/add" element={<CustomPackageForm />} />
+          <Route path="/custom-packages" element={<UserCustomPackage />} />
 
           <Route
             path="/packages/:id/details"
             element={<ViewPackageDetails />}
           />
           <Route path="/wishlist" element={<PageWishlist />} />
-          <Route path="/wishlist/:packageId" element={<WishlistPackageCard />} />
+          <Route
+            path="/wishlist/:packageId"
+            element={<WishlistPackageCard />}
+          />
           <Route path="/custom-packages-form" element={<CustomPackageForm />} />
           <Route path="/custom-packages" element={<UserCustomPackage />} />
           <Route path="/admin/dashboard" element={<AdminPanel />} />

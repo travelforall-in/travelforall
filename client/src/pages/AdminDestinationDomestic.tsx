@@ -67,7 +67,7 @@ const DomesticDestination = () => {
           >
             <Menu className="w-6 h-6" />
           </button>
-          <h2 className="text-2xl font-bold flex-1">Domestic Destinations</h2>
+          <h1 className="text-2xl font-bold flex-1 -ml-2.5">Domestic Destinations</h1>
           <button
             className="bg-[#F97015] text-white px-4 py-2 rounded hover:bg-[#ea6207] transition"
             onClick={() => navigate("/admin/create-state")}

@@ -3,7 +3,13 @@ import axios from "axios";
 import { toast } from "sonner";
 import Sidebar from "@/components/Sidebar";
 import { useNavigate } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Menu, Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 interface User {
   _id: string;
@@ -26,14 +32,10 @@ const ManageUsers: React.FC = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log("Stored Token:", token);
-
       const response = await axios.get(
         "http://localhost:5000/api/admin/users",
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       setUsers(response.data.data || []);
@@ -47,9 +49,7 @@ const ManageUsers: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         await axios.delete(`http://localhost:5000/api/admin/users/${_id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("User deleted successfully!");
         fetchUsers();
@@ -104,8 +104,8 @@ const ManageUsers: React.FC = () => {
             </button>
             <h2 className="text-2xl font-bold">Manage Users</h2>
           </div>
-          <div className="flex items-center gap-4"></div>
         </header>
+
         <input
           type="text"
           placeholder="Search by name or phone"
@@ -113,6 +113,7 @@ const ManageUsers: React.FC = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border p-2 rounded w-full md:w-1/3 mb-4"
         />
+
         <table className="w-full border">
           <thead>
             <tr className="bg-gray-100">
@@ -127,23 +128,26 @@ const ManageUsers: React.FC = () => {
                 <td className="p-2 border">{user.name}</td>
                 <td className="p-2 border">{user.phone}</td>
                 <td className="p-2 border">
-                  <button
-                    className="text-blue-500 mr-4"
-                    onClick={() => alert("Edit logic here")}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="text-red-500"
-                    onClick={() => handleDelete(user._id)}
-                  >
-                    Delete
-                  </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        aria-label="Delete User"
+                        onClick={() => handleDelete(user._id)}
+                        className="transition-transform hover:scale-110 hover:bg-red-600"
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Delete</TooltipContent>
+                  </Tooltip>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+
         {totalPages > 1 && (
           <div className="flex justify-center mt-4">
             {Array.from({ length: totalPages }).map((_, index) => (

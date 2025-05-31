@@ -116,7 +116,7 @@ const BookingList: React.FC = () => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h2 className="text-2xl font-bold">All Bookings</h2>
+            <h1 className="text-2xl font-bold -ml-2.5">All Bookings</h1>
           </div>
           <button
             onClick={() => navigate("/admin/manage-bookings")}
@@ -130,11 +130,11 @@ const BookingList: React.FC = () => {
             <Card key={booking._id} className="shadow-lg">
               <CardContent className="p-4">
                 <h3 className="text-xl font-semibold mb-2">
-                  {booking.package.name}
+                  {booking.package?.name}
                 </h3>
                 <div className="text-sm text-gray-600 mb-2">
-                  <span>Type: {booking.package.type}</span> |{" "}
-                  <span>Destination: {booking.package.destination}</span>
+                  <span>Type: {booking.package?.type}</span> |{" "}
+                  <span>Destination: {booking.package?.destination}</span>
                 </div>
                 <div className="mb-2">
                   <strong>User:</strong> {booking.user?.name} (
