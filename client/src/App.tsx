@@ -44,14 +44,12 @@ import FeaturedPackages from "./components/FeaturedPackages";
 import ViewPackages from "./pages/ViewPackages";
 import ViewPackageDetails from "./pages/ViewPackageDetails";
 import BookingList from "./pages/AdminBookingList";
-
+import ManageBookings from "./pages/AdminManageBookings";
+import EditPackage from "./pages/AdminEditPackage";
+import PageWishlist from "./pages/PageWishlist";
+import WishlistPackageCard from "./pages/WishlistPackageCard";
 import CustomPackageForm from "./pages/CustomPackageForm";
 import UserCustomPackage from "./pages/UserCustomPackage";
-
-
-
-import ManageBookings from "./pages/AdminManageBookings";
-
 
 const queryClient = new QueryClient();
 
@@ -83,14 +81,14 @@ const App = () => (
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/packages/:id" element={<ViewPackages />} />
-
-          {<Route path="/custom-packages-form" element={<CustomPackageForm />} />}
-          <Route path="/custom-packages" element={<UserCustomPackage />} />
-
           <Route
             path="/packages/:id/details"
             element={<ViewPackageDetails />}
           />
+          <Route path="/wishlist" element={<PageWishlist />} />
+          <Route path="/wishlist/:packageId" element={<WishlistPackageCard />} />
+          <Route path="/custom-packages-form" element={<CustomPackageForm />} />
+          <Route path="/custom-packages" element={<UserCustomPackage />} />
           <Route path="/admin/dashboard" element={<AdminPanel />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
           <Route path="/admin/bookings" element={<BookingList />} />
@@ -111,6 +109,7 @@ const App = () => (
             path="/admin/create-package"
             element={<AdminCreatePackage />}
           />
+          <Route path="/admin/edit-package/:id" element={<EditPackage />} />
 
           {/* Auth-protected routes */}
           <Route element={<ProtectedRoute />}>
@@ -125,7 +124,6 @@ const App = () => (
           </Route>
 
           <Route path="*" element={<NotFound />} />
-          
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

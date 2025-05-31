@@ -50,9 +50,10 @@ router.use(protect);
 // User routes
 router.post('/:id/reviews', addReview);
 router.post('/custom', validate(customPackageValidation), createCustomPackage);
-router.post('/wishlist/:id', addToWishlist);
-router.get('/wishlist', getWishlist);
-router.delete('/wishlist/:id', removeFromWishlist);
+
+// router.post('/wishlist/:id', addToWishlist);
+// router.get('/wishlist', getWishlist);
+// router.delete('/wishlist/:id', removeFromWishlist);
 
 // Admin only routes with file upload middleware
 router.post(
