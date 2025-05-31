@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { Menu } from "lucide-react";
-import axios from "axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const BOOKINGS_PER_PAGE = 4;
 
@@ -80,9 +80,29 @@ const ManageBookings = () => {
         }
       );
       toast.success("Booking updated successfully");
-      navigate(-1);
+      navigate("/admin/bookings");
+      fetchBookings();
     } catch (err) {
       toast.error("Failed to update booking");
+    }
+  };
+
+  const handleCancel = async (id) => {
+    try {
+      await axios.put(
+        `http://localhost:5000/api/bookings/${id}/cancel`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
+      toast.success("Booking cancelled successfully");
+      navigate("/admin/bookings");
+      fetchBookings();
+    } catch (err) {
+      toast.error("Failed to cancel booking");
     }
   };
 
@@ -111,71 +131,70 @@ const ManageBookings = () => {
           >
             <Menu className="w-6 h-6" />
           </button>
-          <h1 className="text-2xl font-bold">Manage Bookings</h1>
+          <h1 className="text-2xl font-bold -ml-2.5">Manage Bookings</h1>
         </header>
         {currentBookings.map((booking, index) => (
-          <Card
-            key={booking._id}
-            className="mb-4 shadow-lg hover:shadow-xl transition-shadow duration-300"
-          >
-            <CardContent className="p-8">
-              <div className="flex flex-col gap-4">
-                <p>
-                  <strong>User:</strong> {booking.user?.name}
-                </p>
-                <p>
-                  <strong>Package:</strong> {booking.package.name}
-                </p>
-                <p>
-                  <strong>Total Price:</strong> ₹{booking.totalPrice}
-                </p>
-                <p>
-                  <strong>Travel Date:</strong>{" "}
-                  {new Date(booking.travelDate).toLocaleDateString()}
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium">
-                      Booking Status
-                    </label>
-                    <Select
-                      value={booking.editableBookingStatus}
-                      onValueChange={(val) =>
-                        handleStatusChange(index, "editableBookingStatus", val)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="confirmed">Confirmed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+          <Card key={booking._id} className="mb-4">
+            <CardContent className="p-4 space-y-2">
+              <p>
+                <strong>User:</strong> {booking.user?.name}
+              </p>
+              <p>
+                <strong>Package:</strong> {booking.package?.name}
+              </p>
+              <p>
+                <strong>Total Price:</strong> ₹{booking.totalPrice}
+              </p>
+              <p>
+                <strong>Travel Date:</strong>{" "}
+                {new Date(booking.travelDate).toLocaleDateString()}
+              </p>
 
-                  <div>
-                    <label className="block text-sm font-medium">
-                      Payment Status
-                    </label>
-                    <Select
-                      value={booking.editablePaymentStatus}
-                      onValueChange={(val) =>
-                        handleStatusChange(index, "editablePaymentStatus", val)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Booking Status
+                  </label>
+                  <Select
+                    value={booking.editableBookingStatus}
+                    onValueChange={(val) =>
+                      handleStatusChange(index, "editableBookingStatus", val)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="confirmed">Confirmed</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Payment Status
+                  </label>
+                  <Select
+                    value={booking.editablePaymentStatus}
+                    onValueChange={(val) =>
+                      handleStatusChange(index, "editablePaymentStatus", val)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex gap-4 mt-4">
                 <Button
-                  className="mt-4 w-fit"
+                  className="mt-2"
                   onClick={() =>
                     handleUpdate(
                       booking._id,
@@ -186,21 +205,44 @@ const ManageBookings = () => {
                 >
                   Update Booking
                 </Button>
+                {(booking.bookingStatus === "pending" ||
+                  booking.bookingStatus === "confirmed" ||
+                  booking.paymentStatus === "pending" ||
+                  booking.paymentStatus === "completed") && (
+                  <Button
+                    className="mt-2"
+                    variant="destructive"
+                    onClick={() => handleCancel(booking._id)}
+                  >
+                    Cancel Booking
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
         ))}
 
-        <div className="flex justify-center gap-2 mt-4">
-          {Array.from({ length: totalPages }, (_, i) => (
-            <Button
-              key={i}
-              variant={i + 1 === currentPage ? "default" : "outline"}
-              onClick={() => setCurrentPage(i + 1)}
-            >
-              {i + 1}
-            </Button>
-          ))}
+        {/* Pagination Controls */}
+        <div className="flex justify-center items-center mt-6 gap-4">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
         </div>
       </div>
     </div>

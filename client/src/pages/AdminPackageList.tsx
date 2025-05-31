@@ -3,14 +3,24 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "@/components/Sidebar";
 import { toast } from "sonner";
-import { Menu } from "lucide-react";
+import { Menu, Pencil, Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 interface TravelPackage {
   id: string;
   name: string;
   destination: string;
   price: number;
-  duration: string;
+  type: "domestic" | "international";
+  duration: {
+    days: number;
+    nights: number;
+  };
   status: "Active" | "Inactive";
 }
 
@@ -53,6 +63,29 @@ const PackageListPage: React.FC = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleDelete = async (packageId: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this package?"
+    );
+    if (!confirmed) return;
+
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.delete(`http://localhost:5000/api/packages/${packageId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setPackages((prev) => prev.filter((pkg) => pkg.id !== packageId));
+      toast.success("Package deleted successfully.");
+    } catch (error) {
+      console.error("Failed to delete package:", error);
+      toast.error("Failed to delete package. Please try again.");
+    }
+  };
+
   const filteredPackages = packages.filter((pkg) =>
     pkg.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -88,7 +121,7 @@ const PackageListPage: React.FC = () => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h1 className="text-2xl font-bold">Travel Packages</h1>
+            <h1 className="text-2xl font-bold -ml-2.5">Travel Packages</h1>
           </div>
           <button
             className="bg-[#F97015] text-white px-4 py-2 rounded hover:bg-[#ea6207]"
@@ -141,12 +174,36 @@ const PackageListPage: React.FC = () => {
                   </span>
                 </td>
                 <td className="p-3 space-x-2">
-                  <button className="text-blue-600 hover:underline">
-                    Edit
-                  </button>
-                  <button className="text-red-600 hover:underline">
-                    Delete
-                  </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Edit Package"
+                        onClick={() =>
+                          navigate(`/admin/edit-package/${pkg.id}`)
+                        }
+                        className="transition-transform hover:scale-110 hover:bg-blue-50"
+                      >
+                        <Pencil className="w-4 h-4 text-blue-600" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Edit</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        aria-label="Delete Package"
+                        onClick={() => handleDelete(pkg.id)}
+                        className="transition-transform hover:scale-110 hover:bg-red-600"
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Delete</TooltipContent>
+                  </Tooltip>
                 </td>
               </tr>
             ))}

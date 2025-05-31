@@ -36,7 +36,7 @@ const Destination = () => {
           >
             <Menu className="w-6 h-6" />
           </button>
-          <h1 className="text-2xl font-bold">Choose Destination Type</h1>
+          <h1 className="text-2xl font-bold -ml-2.5">Choose Destination Type</h1>
         </header>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Domestic Button */}

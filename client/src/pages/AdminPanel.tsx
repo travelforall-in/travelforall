@@ -119,7 +119,7 @@ const Dashboard = () => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h2 className="text-2xl font-bold">Dashboard</h2>
+            <h1 className="text-2xl font-bold -ml-2.5">Dashboard</h1>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-gray-600 hidden md:block">
