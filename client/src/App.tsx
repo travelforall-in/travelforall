@@ -18,7 +18,6 @@ import PublicRoute from "./components/PublicRoute";
 import SearchResultsPage from "./pages/SearchResultsPage";
 // import AllPackages from "./pages/AllPackages";
 import MyPackages from "./pages/MyPackages";
-import WishlistPage from "./components/WishlistPage";
 import Domestic from "./pages/Domestic";
 import BookingPage from "./pages/BookingPage";
 import PaymentPage from "./pages/PaymentPage";
@@ -47,7 +46,7 @@ import BookingList from "./pages/AdminBookingList";
 import ManageBookings from "./pages/AdminManageBookings";
 import EditPackage from "./pages/AdminEditPackage";
 import PageWishlist from "./pages/PageWishlist";
-import WishlistPackageCard from "./pages/WishlistPackageCard";
+
 import CustomPackageForm from "./pages/CustomPackageForm";
 import UserCustomPackage from "./pages/UserCustomPackage";
 
@@ -75,7 +74,9 @@ const App = () => (
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/payment-history" element={<PaymentHistory />} />
           <Route path="/my-packages" element={<MyPackages userId="" />} />
-          <Route path="/wishlist" element={<WishlistPage />} />
+         
+          <Route path="/wishlist" element={<PageWishlist />} />
+
           <Route path="/destinations/:type" element={<Domestic />} />
           <Route
             path="/booking/:packageId"
@@ -93,10 +94,8 @@ const App = () => (
             element={<ViewPackageDetails />}
           />
           <Route path="/wishlist" element={<PageWishlist />} />
-          <Route
-            path="/wishlist/:packageId"
-            element={<WishlistPackageCard />}
-          />
+         
+          
           <Route path="/custom-packages-form" element={<CustomPackageForm />} />
           <Route path="/custom-packages" element={<UserCustomPackage />} />
           <Route path="/admin/dashboard" element={<AdminPanel />} />
