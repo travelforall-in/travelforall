@@ -4,12 +4,13 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
 import FeaturedDestinations from '@/components/FeaturedDestinations';
-// import PopularPackages from '@/components/PopularPackages';
+import FeaturedPackages from '@/components/FeaturedPackages';
 import Testimonials from '@/components/Testimonials';
 import NewsletterSection from '@/components/NewsletterSection';
+import PartnerSection from '@/components/PartnerSection';
 import { useParams } from 'react-router-dom';
 
-const Index = () => {
+const Index: React.FC = () => {
   const { id } = useParams();
 
   return (
@@ -18,7 +19,8 @@ const Index = () => {
       <main className="flex-grow pt-16">
         <HeroSection />
         <FeaturedDestinations />
-        {/* <PopularPackages /> */}
+        <FeaturedPackages />
+        <PartnerSection />
         <Testimonials />
         <NewsletterSection />
       </main>
