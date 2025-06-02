@@ -8,14 +8,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+
 // import PackagesPage from "./pages/PackagesPage";
 import NotFound from "./pages/NotFound";
 import AllDestinations from "./components/AllDestinations";
+// import ExplorePackages from "./pages/ExplorePackages";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import SearchResultsPage from "./pages/SearchResultsPage";
+
 // import AllPackages from "./pages/AllPackages";
 import MyPackages from "./pages/MyPackages";
 import Domestic from "./pages/Domestic";
@@ -27,28 +30,11 @@ import Account from "./pages/Account";
 import AccountSettings from "./pages/AccountSettings";
 import ChangePassword from "./pages/ChangePassword";
 import PaymentHistory from "./pages/PaymentHistory";
+import AdminDashboard from "./pages/AdminDashboard";
 import AdminCreatePackage from "./pages/AdminCreatePackage";
 import AdminPanel from "./pages/AdminPanel";
 import AdminPackageList from "./pages/AdminPackageList";
-import ManageUsers from "./pages/AdminManageUsers";
-import AllPackagesPage from "./pages/AllPackagesPage";
-import PartnerDetails from "./Parnters/PartnerDetails";
-import Destination from "./pages/AdminDestination";
-import DomesticDestination from "./pages/AdminDestinationDomestic";
-import InternationalDestination from "./pages/AdminDestinationInternational";
-import StatePackages from "./pages/AdminStatePackages";
-import CreateState from "./pages/AdminCreateState";
-import ExplorePackages from "./pages/ExplorePackages";
-import FeaturedPackages from "./components/FeaturedPackages";
-import ViewPackages from "./pages/ViewPackages";
-import ViewPackageDetails from "./pages/ViewPackageDetails";
-import BookingList from "./pages/AdminBookingList";
-import ManageBookings from "./pages/AdminManageBookings";
-import EditPackage from "./pages/AdminEditPackage";
-import PageWishlist from "./pages/PageWishlist";
-
-import CustomPackageForm from "./pages/CustomPackageForm";
-import UserCustomPackage from "./pages/UserCustomPackage";
+import ManageUsers from "./pages/ManageUsers";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +44,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+      <QRPopup />
+      {/* <ChatbotWithQR /> */}
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Index />} />
@@ -70,13 +58,11 @@ const App = () => (
           <Route path="/partner-details" element={<PartnerDetails />} />
           <Route path="/all-packages" element={<FeaturedPackages />} />
           <Route path="/account" element={<Account />} />
-          <Route path="/account-settings" element={<AccountSettings />} />
-          <Route path="/change-password" element={<ChangePassword />} />
-          <Route path="/payment-history" element={<PaymentHistory />} />
-          <Route path="/my-packages" element={<MyPackages userId="" />} />
-         
-          <Route path="/wishlist" element={<PageWishlist />} />
-
+           <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/change-password"element={<ChangePassword />} />
+             <Route path="/payment-history"element={<PaymentHistory />} />
+          <Route path="/my-packages" element={<MyPackages />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/destinations/:type" element={<Domestic />} />
           <Route
             path="/booking/:packageId"
@@ -84,41 +70,13 @@ const App = () => (
           />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
-          <Route path="/packages/:id" element={<ViewPackages />} />
-
-          <Route path="/custom-packages/add" element={<CustomPackageForm />} />
-          <Route path="/custom-packages" element={<UserCustomPackage />} />
-
-          <Route
-            path="/packages/:id/details"
-            element={<ViewPackageDetails />}
-          />
-          <Route path="/wishlist" element={<PageWishlist />} />
-         
-          
-          <Route path="/custom-packages-form" element={<CustomPackageForm />} />
-          <Route path="/custom-packages" element={<UserCustomPackage />} />
           <Route path="/admin/dashboard" element={<AdminPanel />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
-          <Route path="/admin/bookings" element={<BookingList />} />
-          <Route path="/admin/manage-bookings" element={<ManageBookings />} />
-          <Route path="/admin/destination" element={<Destination />} />
-          <Route
-            path="/admin/destination/domestic"
-            element={<DomesticDestination />}
-          />
-          <Route
-            path="/admin/destination/international"
-            element={<InternationalDestination />}
-          />
-          <Route path="/admin/state/:id/packages" element={<StatePackages />} />
-          <Route path="/admin/create-state" element={<CreateState />} />
           <Route path="/admin/package-list" element={<AdminPackageList />} />
           <Route
             path="/admin/create-package"
             element={<AdminCreatePackage />}
           />
-          <Route path="/admin/edit-package/:id" element={<EditPackage />} />
 
           {/* Auth-protected routes */}
           <Route element={<ProtectedRoute />}>
