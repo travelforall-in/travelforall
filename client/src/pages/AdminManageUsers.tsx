@@ -79,7 +79,7 @@ const ManageUsers: React.FC = () => {
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar
         isCollapsed={isCollapsed}
         onLogout={handleLogout}
@@ -88,12 +88,10 @@ const ManageUsers: React.FC = () => {
         onDashboardClick={() => navigate("/admin/dashboard")}
         onDestinationClick={() => navigate("/admin/destination")}
         onBookingsClick={() => navigate("/admin/bookings")}
+        onCustomPackageClick={() => navigate("/admin/custom-package")}
       />
-      <div
-        className={`flex-1 p-6 bg-gray-50 min-h-screen transition-all duration-300 ${
-          isCollapsed ? "ml-20" : "ml-64"
-        }`}
-      >
+
+      <div className="flex-1 p-4 -ml-3 md:p-7 max-w-screen-xl mx-auto">
         <header className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <button
@@ -114,39 +112,41 @@ const ManageUsers: React.FC = () => {
           className="border p-2 rounded w-full md:w-1/3 mb-4"
         />
 
-        <table className="w-full border">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2 border">Name</th>
-              <th className="p-2 border">Phone</th>
-              <th className="p-2 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentUsers.map((user) => (
-              <tr key={user._id} className="text-center">
-                <td className="p-2 border">{user.name}</td>
-                <td className="p-2 border">{user.phone}</td>
-                <td className="p-2 border">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        aria-label="Delete User"
-                        onClick={() => handleDelete(user._id)}
-                        className="transition-transform hover:scale-110 hover:bg-red-600"
-                      >
-                        <Trash className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Delete</TooltipContent>
-                  </Tooltip>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full border">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="p-2 border">Name</th>
+                <th className="p-2 border">Phone</th>
+                <th className="p-2 border">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentUsers.map((user) => (
+                <tr key={user._id} className="text-center">
+                  <td className="p-2 border">{user.name}</td>
+                  <td className="p-2 border">{user.phone}</td>
+                  <td className="p-2 border">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          aria-label="Delete User"
+                          onClick={() => handleDelete(user._id)}
+                          className="transition-transform hover:scale-110 hover:bg-red-600"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete</TooltipContent>
+                    </Tooltip>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {totalPages > 1 && (
           <div className="flex justify-center mt-4">

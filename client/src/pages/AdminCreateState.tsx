@@ -104,7 +104,7 @@ const CreateState = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar
         isCollapsed={isCollapsed}
         onLogout={handleLogout}
@@ -113,12 +113,9 @@ const CreateState = () => {
         onDashboardClick={() => navigate("/admin/dashboard")}
         onDestinationClick={() => navigate("/admin/destination")}
         onBookingsClick={() => navigate("/admin/bookings")}
+        onCustomPackageClick={() => navigate("/admin/custom-package")}
       />
-      <div
-        className={`flex-1 p-6 bg-gray-100 min-h-screen transition-all duration-300 ${
-          isCollapsed ? "ml-20" : "ml-64"
-        }`}
-      >
+      <div className="flex-1 p-4 -ml-3 md:p-7 max-w-screen-xl mx-auto">
         <header className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <button
@@ -127,10 +124,10 @@ const CreateState = () => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h1 className="text-2xl font-bold -ml-2.5">Create New State</h1>
+            <h1 className="text-2xl font-bold">Create New State</h1>
           </div>
         </header>
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-10">
+        <div className="bg-white shadow-md rounded-md p-6 w-full max-w-4xl mx-auto">
           {/* <h2 className="text-3xl font-bold mb-8 text-gray-800">
             Create New State
           </h2> */}

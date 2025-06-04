@@ -46,6 +46,10 @@ import EditPackage from "./pages/AdminEditPackage";
 import PageWishlist from "./pages/PageWishlist";
 import CustomPackageForm from "./pages/CustomPackageForm";
 import UserCustomPackage from "./pages/UserCustomPackage";
+import CustomPackageList from "./pages/AdminCustomPackageList";
+import AdminHotelsPage from "./pages/AdminHotelsPage";
+import AdminLocationsPage from "./pages/AdminLocationsPage";
+import EditLocationPage from "./pages/AdminEditLocation";
 
 const queryClient = new QueryClient();
 
@@ -81,10 +85,8 @@ const App = () => (
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/packages/:id" element={<ViewPackages />} />
-
           <Route path="/custom-packages/add" element={<CustomPackageForm />} />
           <Route path="/custom-packages" element={<UserCustomPackage />} />
-
           <Route
             path="/packages/:id/details"
             element={<ViewPackageDetails />}
@@ -113,19 +115,28 @@ const App = () => (
             element={<AdminCreatePackage />}
           />
           <Route path="/admin/edit-package/:id" element={<EditPackage />} />
+          <Route
+            path="/admin/custom-packages"
+            element={<CustomPackageList />}
+          />
+          <Route path="/admin/hotels" element={<AdminHotelsPage />} />.
+          <Route path="/admin/locations" element={<AdminLocationsPage />} />
+          <Route
+            path="/admin/locations/edit/:id"
+            element={<EditLocationPage />}
+          />
+
 
           {/* Auth-protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/user/:id" element={<Index />} />
             {/* Add more protected routes here */}
           </Route>
-
           {/* Auth public routes (only accessible when not logged in) */}
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
           </Route>
-
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
