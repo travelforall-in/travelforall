@@ -27,10 +27,6 @@ const StatePackages = () => {
     navigate("/login");
   };
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
   useEffect(() => {
     const fetchPackages = async () => {
       try {
@@ -50,7 +46,7 @@ const StatePackages = () => {
   }, [id]);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar
         isCollapsed={isCollapsed}
         onLogout={handleLogout}
@@ -59,16 +55,14 @@ const StatePackages = () => {
         onDashboardClick={() => navigate("/admin/dashboard")}
         onDestinationClick={() => navigate("/admin/destination")}
         onBookingsClick={() => navigate("/admin/bookings")}
+        onCustomPackageClick={() => navigate("/admin/custom-package")}
       />
-      <div
-        className={`flex-1 p-6 bg-gray-50 min-h-screen transition-all duration-300 ${
-          isCollapsed ? "ml-20" : "ml-64"
-        }`}
-      >
-        <div className="flex justify-between items-center mb-6">
+
+      <div className="flex-1 p-4 -ml-3 md:p-7 max-w-screen-xl mx-auto">
+        <header className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <button
-              onClick={toggleSidebar}
+              onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Menu className="w-6 h-6" />
@@ -80,7 +74,8 @@ const StatePackages = () => {
               + Create New Package
             </button>
           </Link>
-        </div>
+        </header>
+
         {loading ? (
           <p>Loading packages...</p>
         ) : error ? (

@@ -93,7 +93,7 @@ const BookingList: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar
         isCollapsed={isCollapsed}
         onLogout={handleLogout}
@@ -102,13 +102,10 @@ const BookingList: React.FC = () => {
         onDashboardClick={() => navigate("/admin/dashboard")}
         onDestinationClick={() => navigate("/admin/destination")}
         onBookingsClick={() => navigate("/admin/bookings")}
+        onCustomPackageClick={() => navigate("/admin/custom-packages")}
       />
-      <div
-        className={`flex-1 p-6 bg-gray-50 min-h-screen transition-all duration-300 ${
-          isCollapsed ? "ml-20" : "ml-64"
-        }`}
-      >
-        <div className="flex justify-between items-center mb-6">
+      <div className="flex-1 p-4 -ml-3 md:p-7 max-w-screen-xl mx-auto">
+        <header className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
@@ -116,7 +113,7 @@ const BookingList: React.FC = () => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h1 className="text-2xl font-bold -ml-2.5">All Bookings</h1>
+            <h1 className="text-2xl font-bold">All Bookings</h1>
           </div>
           <button
             onClick={() => navigate("/admin/manage-bookings")}
@@ -124,7 +121,8 @@ const BookingList: React.FC = () => {
           >
             Manage Bookings
           </button>
-        </div>
+        </header>
+
         <div className="grid gap-4 md:grid-cols-2">
           {paginatedBookings.map((booking) => (
             <Card key={booking._id} className="shadow-lg">
