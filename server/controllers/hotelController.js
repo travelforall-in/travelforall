@@ -187,7 +187,7 @@ exports.getHotels = async (req, res) => {
 // @desc    Get single hotel
 // @route   GET /api/hotels/:id
 // @access  Public
-exports.getHotel = async (req, res) => {
+exports. getHotel = async (req, res) => {
   try {
     // Validate ID
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {

@@ -28,8 +28,8 @@ const CustomPackageForm = () => {
   });
 
   const [message, setMessage] = useState('');
-  const [error, setError] = useState('')
-  const nevigate = useNavigate();
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -94,14 +94,14 @@ const CustomPackageForm = () => {
     };
 
     try {
-      const response = await axios.post(`${BASE_URL}/custom-packages`, payload, {
+      await axios.post(`${BASE_URL}/custom-packages`, payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
       setMessage('Package submitted successfully!');
-      nevigate('/custom-packages');
       setError('');
+      navigate('/custom-packages');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error submitting package');
       setMessage('');
@@ -109,14 +109,22 @@ const CustomPackageForm = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">Create Custom Package</h2>
+    <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg relative">
+      {/* Back button on top-left */}
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="absolute top-4 left-4 bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition"
+      >
+        Back
+      </button>
+
+      <h2 className="text-2xl font-bold mb-6 text-center">Create Custom Package</h2>
 
       {message && <p className="text-green-600 mb-4">{message}</p>}
       {error && <p className="text-red-600 mb-4">{error}</p>}
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
         {/* Basic Info */}
         <label>
           Name
@@ -358,6 +366,7 @@ const CustomPackageForm = () => {
           />
         </label>
 
+        {/* Submit Button */}
         <button
           type="submit"
           className="col-span-1 md:col-span-2 bg-orange-600 text-white py-3 rounded hover:bg-orange-700 transition"
