@@ -50,6 +50,9 @@ import CustomPackageList from "./pages/AdminCustomPackageList";
 import AdminHotelsPage from "./pages/AdminHotelsPage";
 import AdminLocationsPage from "./pages/AdminLocationsPage";
 import EditLocationPage from "./pages/AdminEditLocation";
+import EditHotelPage from "./pages/AdminEditHotel";
+import CreateHotelPage from "./pages/AdminCreateHotel";
+import CreateLocationPage from "./pages/AdminCreateLocation";
 
 const queryClient = new QueryClient();
 
@@ -120,13 +123,17 @@ const App = () => (
             element={<CustomPackageList />}
           />
           <Route path="/admin/hotels" element={<AdminHotelsPage />} />.
+          <Route path="/admin/hotels/edit/:id" element={<EditHotelPage />} />
+          <Route path="/admin/hotels/create" element={<CreateHotelPage />} />
           <Route path="/admin/locations" element={<AdminLocationsPage />} />
           <Route
             path="/admin/locations/edit/:id"
             element={<EditLocationPage />}
           />
-
-
+          <Route
+            path="/admin/locations/create"
+            element={<CreateLocationPage />}
+          />
           {/* Auth-protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/user/:id" element={<Index />} />

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "@/components/Sidebar";
 import { Menu, Plus, Pencil, Trash2, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Attraction {
   name: string;
@@ -93,19 +94,23 @@ const AdminLocationsPage = () => {
     }
   }, [search]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    toast.success("Logged out successfully.");
+    navigate("/login");
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar
         isCollapsed={isCollapsed}
-        onLogout={() => {
-          localStorage.removeItem("adminToken");
-          window.location.href = "/admin/login";
-        }}
-        onDashboardClick={() => navigate("/admin/dashboard")}
-        onManageUsersClick={() => navigate("/admin/users")}
-        onBookingsClick={() => navigate("/admin/bookings")}
-        onDestinationClick={() => navigate("/admin/destination")}
+        onLogout={handleLogout}
         onPackageClick={() => navigate("/admin/package-list")}
+        onManageUsersClick={() => navigate("/admin/manage-users")}
+        onDashboardClick={() => navigate("/admin/dashboard")}
+        onDestinationClick={() => navigate("/admin/destination")}
+        onBookingsClick={() => navigate("/admin/bookings")}
         onCustomPackageClick={() => navigate("/admin/custom-packages")}
       />
 
@@ -139,7 +144,7 @@ const AdminLocationsPage = () => {
               </button>
             </div>
             <button
-              onClick={() => navigate("/admin/locations/new")}
+              onClick={() => navigate("/admin/locations/create")}
               className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 text-sm rounded-lg transition"
             >
               <Plus size={18} />
