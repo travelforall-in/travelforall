@@ -1,3 +1,4 @@
+// UserCustomNavbar.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -129,7 +130,11 @@ const UserCustomNavbar = () => {
           <h2 className="text-xl font-semibold text-orange-700 mt-4 mb-2">🏨 Hotels</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {hotels.map((hotel) => (
-              <div key={hotel._id} className="bg-white rounded-xl shadow border p-4 hover:shadow-md transition">
+              <div
+                key={hotel._id}
+                className="cursor-pointer bg-white rounded-xl shadow border p-4 hover:shadow-md transition"
+                onClick={() => navigate(`/hotels/${hotel._id}`, { state: { hotel } })}
+              >
                 <img
                   src={hotel.fullImageUrls[0]}
                   alt={hotel.name}
