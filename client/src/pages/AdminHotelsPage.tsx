@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "@/components/Sidebar";
-import { Menu, Plus, Pencil, Trash2 } from "lucide-react";
+import { Menu, Plus, Pencil, Trash2, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Hotel {
   _id: string;
@@ -24,12 +25,18 @@ interface Hotel {
 }
 
 const AdminHotelsPage = () => {
+  const [search, setSearch] = useState("");
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
 
-  const handleSidebarToggle = () => setIsCollapsed((prev) => !prev);
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    toast.success("Logged out successfully.");
+    navigate("/login");
+  };
 
   const fetchHotels = async () => {
     try {
@@ -44,6 +51,28 @@ const AdminHotelsPage = () => {
       console.error("Error fetching hotels:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    if (search.trim() === "") {
+      fetchHotels();
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        `http://localhost:5000/api/hotels/search?keyword=${search}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setHotels(res.data.data);
+    } catch (error) {
+      console.error("Search failed:", error);
     }
   };
 
@@ -62,6 +91,8 @@ const AdminHotelsPage = () => {
     }
   };
 
+  const handleSidebarToggle = () => setIsCollapsed((prev) => !prev);
+
   useEffect(() => {
     fetchHotels();
   }, []);
@@ -70,10 +101,7 @@ const AdminHotelsPage = () => {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar
         isCollapsed={isCollapsed}
-        onLogout={() => {
-          localStorage.removeItem("adminToken");
-          window.location.href = "/admin/login";
-        }}
+        onLogout={handleLogout}
         onDashboardClick={() => navigate("/admin/dashboard")}
         onManageUsersClick={() => navigate("/admin/users")}
         onBookingsClick={() => navigate("/admin/bookings")}
@@ -83,7 +111,7 @@ const AdminHotelsPage = () => {
       />
 
       <div className="flex-1 p-4 -ml-3 md:p-7 max-w-screen-xl mx-auto">
-        <header className="flex justify-between items-center mb-6">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
           <div className="flex items-center gap-4">
             <button
               onClick={handleSidebarToggle}
@@ -93,13 +121,35 @@ const AdminHotelsPage = () => {
             </button>
             <h2 className="text-2xl font-bold">Hotels</h2>
           </div>
-          <button
-            onClick={() => navigate("/admin/hotels/new")}
-            className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 text-sm rounded-lg transition"
-          >
-            <Plus size={18} />
-            Add Hotel
-          </button>
+
+          <div className="flex gap-2 items-center">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search by name..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  if (e.target.value === "") fetchHotels();
+                }}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                className="border border-gray-300 rounded-lg px-3 py-1.5 pr-10 text-sm w-60 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              />
+              <button
+                onClick={handleSearch}
+                className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700"
+              >
+                <Search size={18} />
+              </button>
+            </div>
+            <button
+              onClick={() => navigate("/admin/hotels/create")}
+              className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 text-sm rounded-lg transition"
+            >
+              <Plus size={18} />
+              Add Hotel
+            </button>
+          </div>
         </header>
 
         {loading ? (

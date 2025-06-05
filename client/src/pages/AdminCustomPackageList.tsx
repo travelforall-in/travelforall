@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import Sidebar from "@/components/Sidebar";
 import { Menu, Hotel, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface CustomPackage {
   _id: string;
@@ -53,6 +54,13 @@ const AdminCustomPackagesPage = () => {
 
   const handleSidebarToggle = () => setIsCollapsed((prev) => !prev);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    toast.success("Logged out successfully.");
+    navigate("/login");
+  };
+
   useEffect(() => {
     const fetchCustomPackages = async () => {
       try {
@@ -87,16 +95,13 @@ const AdminCustomPackagesPage = () => {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar
         isCollapsed={isCollapsed}
-        onLogout={() => {
-          localStorage.removeItem("adminToken");
-          window.location.href = "/admin/login";
-        }}
-        onDashboardClick={() => navigate("/admin/dashboard")}
-        onManageUsersClick={() => navigate("/admin/users")}
-        onBookingsClick={() => navigate("/admin/bookings")}
-        onDestinationClick={() => navigate("/admin/destination")}
+        onLogout={handleLogout}
         onPackageClick={() => navigate("/admin/package-list")}
-        onCustomPackageClick={() => {}}
+        onManageUsersClick={() => navigate("/admin/manage-users")}
+        onDashboardClick={() => navigate("/admin/dashboard")}
+        onDestinationClick={() => navigate("/admin/destination")}
+        onBookingsClick={() => navigate("/admin/bookings")}
+        onCustomPackageClick={() => navigate("/admin/custom-packages")}
       />
 
       <div className="flex-1 p-4 -ml-3 md:p-7 max-w-screen-xl mx-auto">

@@ -8,7 +8,6 @@ import {
   PackagePlus,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { ReactNode } from "react";
 
 const Sidebar = ({
   isCollapsed,
