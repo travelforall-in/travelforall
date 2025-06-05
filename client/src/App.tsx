@@ -45,7 +45,7 @@ import ManageBookings from "./pages/AdminManageBookings";
 import EditPackage from "./pages/AdminEditPackage";
 import PageWishlist from "./pages/PageWishlist";
 import CustomPackageForm from "./pages/CustomPackageForm";
-import UserCustomPackage from "./pages/UserCustomPackage";
+
 import CustomPackageList from "./pages/AdminCustomPackageList";
 import AdminHotelsPage from "./pages/AdminHotelsPage";
 import AdminLocationsPage from "./pages/AdminLocationsPage";
@@ -53,6 +53,8 @@ import EditLocationPage from "./pages/AdminEditLocation";
 import EditHotelPage from "./pages/AdminEditHotel";
 import CreateHotelPage from "./pages/AdminCreateHotel";
 import CreateLocationPage from "./pages/AdminCreateLocation";
+import UserCustomPackage from "./pages/UserCustomPackage";
+import CustomPackageDetails from "./pages/CustomPackageDetails";
 
 const queryClient = new QueryClient();
 
@@ -87,8 +89,9 @@ const App = () => (
           />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
-          <Route path="/packages/:id" element={<ViewPackages />} />
+          <Route path="/packages/:id" element={<ViewPackageDetails />} />
           <Route path="/custom-packages/add" element={<CustomPackageForm />} />
+          <Route path="/custom-packages/view" element={<CustomPackageDetails />} />
           <Route path="/custom-packages" element={<UserCustomPackage />} />
           <Route
             path="/packages/:id/details"
@@ -96,7 +99,7 @@ const App = () => (
           />
           <Route path="/wishlist" element={<PageWishlist />} />
           <Route path="/custom-packages-form" element={<CustomPackageForm />} />
-          <Route path="/custom-packages" element={<UserCustomPackage />} />
+          {/* <Route path="/custom-packages" element={<UserCustomPackage />} /> */}
           <Route path="/admin/dashboard" element={<AdminPanel />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
           <Route path="/admin/bookings" element={<BookingList />} />
