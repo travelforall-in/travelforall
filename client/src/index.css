@@ -1,5 +1,4 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -65,4 +64,14 @@
 .backdrop-blur-card {
   backdrop-filter: blur(8px);
   background-color: rgba(255, 255, 255, 0.8);
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+.scroll-container {
+  height: 100%;
 }
