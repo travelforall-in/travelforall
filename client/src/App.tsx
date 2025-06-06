@@ -55,6 +55,7 @@ import CreateHotelPage from "./pages/AdminCreateHotel";
 import CreateLocationPage from "./pages/AdminCreateLocation";
 import UserCustomPackage from "./pages/UserCustomPackage";
 import CustomPackageDetails from "./pages/CustomPackageDetails";
+import HotelDetailsPage from "./pages/HotelDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -92,14 +93,16 @@ const App = () => (
           <Route path="/packages/:id" element={<ViewPackageDetails />} />
           <Route path="/custom-packages/add" element={<CustomPackageForm />} />
           <Route path="/custom-packages/view" element={<CustomPackageDetails />} />
-          <Route path="/custom-packages" element={<UserCustomPackage />} />
+          {/* <Route path="/custom-packages" element={<UserCustomPackage />} /> */}
+          <Route path="/hotels/:id" element={<HotelDetailsPage />} />
+
           <Route
             path="/packages/:id/details"
             element={<ViewPackageDetails />}
           />
           <Route path="/wishlist" element={<PageWishlist />} />
           <Route path="/custom-packages-form" element={<CustomPackageForm />} />
-          {/* <Route path="/custom-packages" element={<UserCustomPackage />} /> */}
+          <Route path="/custom-packages" element={<UserCustomPackage />} />
           <Route path="/admin/dashboard" element={<AdminPanel />} />
           <Route path="/admin/manage-users" element={<ManageUsers />} />
           <Route path="/admin/bookings" element={<BookingList />} />
