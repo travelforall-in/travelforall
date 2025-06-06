@@ -203,7 +203,7 @@ const EditHotelPage: React.FC = () => {
               <div>
                 <Label>Phone</Label>
                 <Input
-                  value={hotel.contactInfo.phone}
+                  value={hotel.contactInfo?.phone}
                   onChange={(e) =>
                     handleNestedChange("contactInfo", "phone", e.target.value)
                   }
@@ -213,7 +213,7 @@ const EditHotelPage: React.FC = () => {
                 <Label>Email</Label>
                 <Input
                   type="email"
-                  value={hotel.contactInfo.email}
+                  value={hotel.contactInfo?.email}
                   onChange={(e) =>
                     handleNestedChange("contactInfo", "email", e.target.value)
                   }
@@ -222,7 +222,7 @@ const EditHotelPage: React.FC = () => {
               <div>
                 <Label>Website</Label>
                 <Input
-                  value={hotel.contactInfo.website}
+                  value={hotel.contactInfo?.website}
                   onChange={(e) =>
                     handleNestedChange("contactInfo", "website", e.target.value)
                   }
@@ -236,7 +236,7 @@ const EditHotelPage: React.FC = () => {
                 <Label>Check-in</Label>
                 <Input
                   type="time"
-                  value={hotel.policies.checkIn}
+                  value={hotel.policies?.checkIn}
                   onChange={(e) =>
                     handleNestedChange("policies", "checkIn", e.target.value)
                   }
@@ -246,7 +246,7 @@ const EditHotelPage: React.FC = () => {
                 <Label>Check-out</Label>
                 <Input
                   type="time"
-                  value={hotel.policies.checkOut}
+                  value={hotel.policies?.checkOut}
                   onChange={(e) =>
                     handleNestedChange("policies", "checkOut", e.target.value)
                   }
@@ -255,7 +255,7 @@ const EditHotelPage: React.FC = () => {
               <div>
                 <Label>Cancellation Policy</Label>
                 <Input
-                  value={hotel.policies.cancellation}
+                  value={hotel.policies?.cancellation}
                   onChange={(e) =>
                     handleNestedChange(
                       "policies",
