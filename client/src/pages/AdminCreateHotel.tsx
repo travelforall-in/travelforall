@@ -13,6 +13,8 @@ const CreateHotelPage = () => {
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [locations, setLocations] = useState([]);
+  const [images, setImages] = useState<File[]>([]);
+
   const [hotelData, setHotelData] = useState({
     name: "",
     location: "",
@@ -42,7 +44,6 @@ const CreateHotelPage = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("response", res.data);
         setLocations(res.data.data || []);
       } catch (err) {
         console.error("Location fetch failed:", err);
@@ -61,39 +62,52 @@ const CreateHotelPage = () => {
     setHotelData({ ...hotelData, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const selectedFiles = Array.from(files).slice(0, 10); // max 10
+      setImages(selectedFiles);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
     if (!token) return toast.error("Admin token missing");
 
     try {
-      const payload = {
-        name: hotelData.name,
-        location: hotelData.location,
-        address: hotelData.address,
-        description: hotelData.description,
-        rating: parseFloat(hotelData.rating),
-        category: hotelData.category,
-        amenities: hotelData.amenities.split(",").map((a) => a.trim()),
-        priceRange: {
-          min: parseInt(hotelData.minPrice),
-          max: parseInt(hotelData.maxPrice),
-        },
-        roomTypes: [],
-        contactInfo: {
-          phone: hotelData.contactPhone,
-          email: hotelData.contactEmail,
-          website: hotelData.contactWebsite,
-        },
-        policies: {
-          checkIn: hotelData.checkIn,
-          checkOut: hotelData.checkOut,
-          cancellation: hotelData.cancellation,
-        },
-      };
+      const formData = new FormData();
+      formData.append("name", hotelData.name);
+      formData.append("location", hotelData.location);
+      formData.append("address", hotelData.address);
+      formData.append("description", hotelData.description);
+      formData.append("rating", hotelData.rating);
+      formData.append("category", hotelData.category);
+      formData.append("priceRange.min", hotelData.minPrice);
+      formData.append("priceRange.max", hotelData.maxPrice);
+      formData.append("contactPhone", hotelData.contactPhone);
+      formData.append("contactEmail", hotelData.contactEmail);
+      formData.append("contactWebsite", hotelData.contactWebsite);
+      formData.append("checkIn", hotelData.checkIn);
+      formData.append("checkOut", hotelData.checkOut);
+      formData.append("cancellation", hotelData.cancellation);
 
-      await axios.post("http://localhost:5000/api/hotels/", payload, {
-        headers: { Authorization: `Bearer ${token}` },
+      hotelData.amenities
+        .split(",")
+        .map((a) => a.trim())
+        .forEach((amenity) => {
+          formData.append("amenities", amenity);
+        });
+
+      images.forEach((image) => {
+        formData.append("images", image);
+      });
+
+      await axios.post("http://localhost:5000/api/hotels/", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       toast.success("Hotel added successfully");
@@ -140,7 +154,6 @@ const CreateHotelPage = () => {
           onSubmit={handleSubmit}
           className="bg-white rounded-xl shadow p-6 space-y-6"
         >
-          {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label>Hotel Name</Label>
@@ -149,6 +162,7 @@ const CreateHotelPage = () => {
                 value={hotelData.name}
                 onChange={handleChange}
                 required
+                className="mt-2 focus:outline-none focus:ring-0"
               />
             </div>
             <div>
@@ -158,7 +172,7 @@ const CreateHotelPage = () => {
                 value={hotelData.location}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 rounded-md p-2 mt-1 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23666%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px_12px] bg-[right_8px_center] bg-no-repeat pr-8"
+                className="w-full border border-gray-300 rounded-md p-2 mt-1.5"
               >
                 <option value="">Select a Location</option>
                 {locations.map((loc) => (
@@ -215,7 +229,6 @@ const CreateHotelPage = () => {
             </div>
           </div>
 
-          {/* Pricing */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label>Min Price</Label>
@@ -237,7 +250,6 @@ const CreateHotelPage = () => {
             </div>
           </div>
 
-          {/* Contact Info */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <Label>Phone</Label>
@@ -265,7 +277,6 @@ const CreateHotelPage = () => {
             </div>
           </div>
 
-          {/* Policies */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <Label>Check-in Time</Label>
@@ -290,6 +301,29 @@ const CreateHotelPage = () => {
                 value={hotelData.cancellation}
                 onChange={handleChange}
               />
+            </div>
+          </div>
+
+          <div className="md:col-span-2">
+            <Label>Upload Hotel Images (Max 10)</Label>
+            <div className="flex flex-col gap-2">
+              <label className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 cursor-pointer transition-colors w-fit mt-2">
+                Choose File
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+              {images.length > 0 && (
+                <ul className="text-sm text-gray-600 list-disc list-inside">
+                  {images.map((img, idx) => (
+                    <li key={idx}>{img.name}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
 
