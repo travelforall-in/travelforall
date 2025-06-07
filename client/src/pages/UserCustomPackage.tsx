@@ -3,81 +3,64 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import BASE_URL from "@/utils/baseUrl";
 
-interface TravelPackage {
+interface City {
   _id: string;
   name: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  budget: number;
-  status: string;
-  specialRequests: string;
-  activities: string[];
-  accommodation: {
-    type: string;
-    preferredRating: number;
-  };
-  transportation: {
-    flights: {
-      required: boolean;
-      preferredClass: string;
-    };
-    localTransport: string;
-  };
-  meals: {
-    included: boolean;
-    preferences: string[];
-  };
-  travelers: {
-    adults: number;
-    children: number;
-    infants: number;
-  };
+  country: string;
 }
 
-const UserCustomPackage = () => {
+interface Hotel {
+  _id: string;
+  name: string;
+  description: string;
+  fullImageUrls: string[];
+  rating: number;
+  address: string;
+  priceRange: { min: number; max: number };
+  amenities: string[];
+}
+
+const UserCustomNavbar = () => {
   const navigate = useNavigate();
-  const [pkg, setPkg] = useState<TravelPackage[]>([]);
-  const [error, setError] = useState("");
+  const [cities, setCities] = useState<City[]>([]);
+  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [hotels, setHotels] = useState<Hotel[]>([]);
+  const [showCities, setShowCities] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchPackage = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/custom-packages/user`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        setPkg(response.data.data);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to load package");
-      }
-    };
-
-    fetchPackage();
-  }, []);
-
-  const handleCancel = async (id: string) => {
+  const fetchCitiesInIndia = async () => {
     try {
-      await axios.put(
-        `${BASE_URL}/custom-packages/${id}/cancel`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      setPkg((prev) => prev.filter((pkg) => pkg._id !== id));
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to cancel package");
+      const res = await axios.get(`${BASE_URL}/locations?country=India`);
+      if (Array.isArray(res.data)) {
+        setCities(res.data);
+      } else if (res.data?.data && Array.isArray(res.data.data)) {
+        setCities(res.data.data);
+      }
+      setShowCities(true);
+    } catch (error) {
+      console.error("Error fetching cities:", error);
     }
   };
 
+  const fetchCityData = async (cityId: string) => {
+    try {
+      const res = await axios.get(`${BASE_URL}/locations/${cityId}/hotels`);
+      setHotels(res.data?.data || []);
+    } catch (error) {
+      console.error("Error fetching hotels for city:", error);
+    }
+  };
+
+  const handleCityClick = (cityId: string) => {
+    setSelectedCity(cityId);
+    fetchCityData(cityId);
+  };
+
   return (
-    <div className="p-4 bg-orange-50 min-h-screen">
-      {/* Navbar */}
-      <div className="flex justify-between items-center bg-white shadow-lg px-6 py-5 rounded-2xl mb-6 border border-orange-200">
+    <div className="flex flex-col gap-6 bg-white shadow-lg px-6 py-5 rounded-2xl border border-orange-200">
+      {/* Header */}
+      <div className="flex justify-between items-center flex-wrap gap-4">
         <h1 className="text-2xl font-bold text-green-700">🎒 Your Custom Packages</h1>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <button
             onClick={() => navigate("/")}
             className="bg-orange-200 hover:bg-orange-300 text-orange-900 font-semibold px-4 py-2 rounded-2xl shadow"
@@ -85,98 +68,81 @@ const UserCustomPackage = () => {
             ← Home
           </button>
           <button
-            onClick={() => navigate("/custom-packages/add")}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-2xl shadow"
+            onClick={() => navigate("/custom-packages/view")}
+            className="bg-blue-200 hover:bg-blue-300 text-blue-900 font-semibold px-4 py-2 rounded-2xl shadow"
           >
-            + Create Package
+            👁️ View Custom Packages
           </button>
         </div>
       </div>
 
-      {/* Error Message */}
-      {error && <p className="text-red-600 text-center mt-10 font-medium">{error}</p>}
+      {/* India Button */}
+      <button
+        onClick={fetchCitiesInIndia}
+        className="w-fit bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded shadow"
+      >
+        Show Cities in India
+      </button>
 
-      {/* No Packages */}
-      {pkg.length === 0 ? (
-        <p className="text-gray-600 text-lg text-center mt-16">
-          🚫 You haven’t created any custom travel packages yet.
-        </p>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {pkg.map((item) => (
-            <div
-              key={item._id}
-              className="bg-white rounded-2xl shadow-lg p-5 border border-gray-100 hover:shadow-xl transition-shadow duration-300"
-            >
-              <div>
-                <h2 className="text-xl font-bold mb-3 text-orange-700">{item.name}</h2>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>📍 Destination:</strong> {item.destination}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>📅 Travel Dates:</strong>{" "}
-                  {new Date(item.startDate).toLocaleDateString()} to{" "}
-                  {new Date(item.endDate).toLocaleDateString()}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>💰 Budget:</strong> ₹{item.budget}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>📌 Status:</strong>{" "}
-                  <span className="capitalize text-green-700 font-semibold">{item.status}</span>
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>🏨 Accommodation:</strong> {item.accommodation.type} (
-                  {item.accommodation.preferredRating}★)
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>🚗 Transport:</strong>{" "}
-                  {item.transportation.flights.required ? "Flight" : "No Flight"} (
-                  {item.transportation.flights.preferredClass}) &{" "}
-                  {item.transportation.localTransport}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>🍽️ Meals:</strong>{" "}
-                  {item.meals.included ? "Included" : "Not Included"} -{" "}
-                  {item.meals.preferences.join(", ")}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>🎯 Activities:</strong> {item.activities.join(", ")}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>👨‍👩‍👧 Travelers:</strong> {item.travelers.adults} Adults,{" "}
-                  {item.travelers.children} Children, {item.travelers.infants} Infants
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>📌 Requests:</strong> {item.specialRequests}
+      {/* Cities List */}
+      {showCities && (
+        <div className="mt-4 flex flex-wrap gap-3">
+          {cities.length > 0 ? (
+            cities.map((city) => (
+              <button
+                key={city._id}
+                onClick={() => handleCityClick(city._id)}
+                className={`px-4 py-2 border rounded-lg shadow-sm ${
+                  selectedCity === city._id
+                    ? "bg-green-200 font-semibold"
+                    : "hover:bg-green-50"
+                }`}
+              >
+                {city.name}
+              </button>
+            ))
+          ) : (
+            <p>No cities available.</p>
+          )}
+        </div>
+      )}
+
+      {/* Hotels Section */}
+      {hotels.length > 0 && (
+        <div>
+          <h2 className="text-xl font-semibold text-orange-700 mt-6 mb-2">
+            🏨 Hotels in {cities.find(c => c._id === selectedCity)?.name}
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {hotels.map((hotel) => (
+              <div
+                key={hotel._id}
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(`/hotels/${hotel._id}`, { state: { hotel } })}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") navigate(`/hotels/${hotel._id}`, { state: { hotel } });
+                }}
+                className="border p-4 rounded-lg shadow hover:shadow-md cursor-pointer"
+              >
+                <img
+                  src={hotel.fullImageUrls[0] || "/placeholder.jpg"}
+                  alt={hotel.name}
+                  className="w-full h-40 object-cover rounded mb-2"
+                />
+                <h3 className="text-lg font-semibold text-green-800">{hotel.name}</h3>
+                <p className="text-sm text-gray-600">{hotel.address}</p>
+                <p className="text-sm">⭐ {hotel.rating}</p>
+                <p className="text-sm text-green-700">
+                  ₹{hotel.priceRange.min} - ₹{hotel.priceRange.max}
                 </p>
               </div>
-
-              {/* Buttons */}
-              <div className="mt-4 flex justify-between gap-2">
-                <button
-                  onClick={() =>
-                    navigate(`/custom-packages/add`, {
-                      state: { packageData: item },
-                    })
-                  }
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                >
-                  ✏️ Update
-                </button>
-                <button
-                  onClick={() => handleCancel(item._id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-                >
-                  ❌ Cancel
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>
   );
 };
 
-export default UserCustomPackage;
+export default UserCustomNavbar;

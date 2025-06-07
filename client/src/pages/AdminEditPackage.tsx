@@ -100,7 +100,7 @@ const EditPackagePage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar
         isCollapsed={isCollapsed}
         onLogout={handleLogout}
@@ -109,22 +109,21 @@ const EditPackagePage: React.FC = () => {
         onDashboardClick={() => navigate("/admin/dashboard")}
         onDestinationClick={() => navigate("/admin/destination")}
         onBookingsClick={() => navigate("/admin/bookings")}
+        onCustomPackageClick={() => navigate("/admin/custom-packages")}
       />
-      <div
-        className={`flex-1 py-10 bg-gray-50 min-h-screen transition-all duration-300 ${
-          isCollapsed ? "ml-20" : "ml-64"
-        }`}
-      >
-        <header className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          <h1 className="text-2xl font-bold -ml-2.5">Edit Travel Package</h1>
+      <div className="flex-1 p-4 -ml-3 md:p-7 max-w-screen-xl mx-auto">
+        <header className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <h1 className="text-2xl font-bold">Edit Travel Package</h1>
+          </div>
         </header>
-        <div className="max-w-2xl mx-auto bg-white p-6 shadow-2xl rounded-lg">
+        <div className="max-w-2xl mx-auto bg-white p-6 shadow-2xl rounded-lg ">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

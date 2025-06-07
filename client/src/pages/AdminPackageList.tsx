@@ -98,7 +98,7 @@ const PackageListPage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar
         isCollapsed={isCollapsed}
         onLogout={handleLogout}
@@ -107,13 +107,10 @@ const PackageListPage: React.FC = () => {
         onDashboardClick={() => navigate("/admin/dashboard")}
         onDestinationClick={() => navigate("/admin/destination")}
         onBookingsClick={() => navigate("/admin/bookings")}
+        onCustomPackageClick={() => navigate("/admin/custom-packages")}
       />
-      <div
-        className={`flex-1 p-6 bg-gray-50 min-h-screen transition-all duration-300 ${
-          isCollapsed ? "ml-20" : "ml-64"
-        }`}
-      >
-        <div className="flex justify-between items-center mb-6">
+      <div className="flex-1 p-4 -ml-3 md:p-7 max-w-screen-xl mx-auto">
+        <header className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
@@ -121,7 +118,7 @@ const PackageListPage: React.FC = () => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h1 className="text-2xl font-bold -ml-2.5">Travel Packages</h1>
+            <h1 className="text-2xl font-bold">Travel Packages</h1>
           </div>
           <button
             className="bg-[#F97015] text-white px-4 py-2 rounded hover:bg-[#ea6207]"
@@ -129,7 +126,7 @@ const PackageListPage: React.FC = () => {
           >
             + Create Package
           </button>
-        </div>
+        </header>
 
         <div className="mb-4">
           <input

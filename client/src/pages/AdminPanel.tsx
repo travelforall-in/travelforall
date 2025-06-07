@@ -72,7 +72,6 @@ const Dashboard = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        // console.log("Dashboard API response:", res.data);
         const {
           overview = {},
           recentUsers = [],
@@ -96,7 +95,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar
         isCollapsed={isCollapsed}
         onLogout={handleLogout}
@@ -105,12 +104,10 @@ const Dashboard = () => {
         onDashboardClick={() => navigate("/admin/dashboard")}
         onDestinationClick={() => navigate("/admin/destination")}
         onBookingsClick={() => navigate("/admin/bookings")}
+        onCustomPackageClick={() => navigate("/admin/custom-packages")}
       />
-      <div
-        className={`flex-1 p-6 bg-gray-50 min-h-screen transition-all duration-300 ${
-          isCollapsed ? "ml-20" : "ml-64"
-        }`}
-      >
+
+      <div className="flex-1 p-4 -ml-3 md:p-7 max-w-screen-xl mx-auto">
         <header className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <button
@@ -119,7 +116,7 @@ const Dashboard = () => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h1 className="text-2xl font-bold -ml-2.5">Dashboard</h1>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-gray-600 hidden md:block">

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import BASE_URL from '@/utils/baseUrl';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/components/ui/use-toast';
 
-const mealOptions = ['Vegetarian', 'Non-Vegetarian', 'others'];
+const mealOptions = ['Vegetarian', 'Non-Vegetarian', 'Others'];
 const activityOptions = ['Sightseeing', 'Adventure Sports', 'Cultural Tours'];
 
 const CustomPackageForm = () => {
@@ -14,9 +15,6 @@ const CustomPackageForm = () => {
     endDate: '',
     accommodationType: '',
     accommodationRating: '',
-    transportationFlights: false,
-    transportationClass: '',
-    transportationLocal: '',
     mealsIncluded: false,
     mealPreferences: [] as string[],
     activities: [] as string[],
@@ -24,18 +22,19 @@ const CustomPackageForm = () => {
     adults: '',
     children: '',
     infants: '',
+    travelersDetails: [] as { name: string; age: number | '' }[],
     specialRequests: ''
   });
 
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('')
-  const nevigate = useNavigate();
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'checkbox' && (name === 'mealsIncluded' || name === 'transportationFlights')) {
+    if (type === 'checkbox' && name === 'mealsIncluded') {
       setFormData({ ...formData, [name]: checked });
     } else if (type === 'number' || type === 'range') {
       setFormData({ ...formData, [name]: Number(value) });
@@ -59,65 +58,121 @@ const CustomPackageForm = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    const total =
+      Number(formData.adults || 0) +
+      Number(formData.children || 0) +
+      Number(formData.infants || 0);
 
-    const payload = {
-      name: formData.name,
-      destination: formData.destination,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-      accommodation: {
-        type: formData.accommodationType,
-        preferredRating: Number(formData.accommodationRating),
-        requirements: []
-      },
-      transportation: {
-        flights: {
-          required: formData.transportationFlights,
-          preferredClass: formData.transportationClass
-        },
-        localTransport: formData.transportationLocal
-      },
-      meals: {
-        included: formData.mealsIncluded,
-        preferences: formData.mealPreferences
-      },
-      activities: formData.activities,
-      budget: Number(formData.budget),
-      travelers: {
-        adults: Number(formData.adults),
-        children: Number(formData.children),
-        infants: Number(formData.infants)
-      },
-      specialRequests: formData.specialRequests
-    };
+    setFormData(prev => {
+      const existing = prev.travelersDetails || [];
+      if (existing.length === total) return prev;
 
-    try {
-      const response = await axios.post(`${BASE_URL}/custom-packages`, payload, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      setMessage('Package submitted successfully!');
-      nevigate('/custom-packages');
-      setError('');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error submitting package');
-      setMessage('');
-    }
+      const updated = Array(total)
+        .fill(0)
+        .map((_, i) => existing[i] || { name: '', age: '' });
+
+      return { ...prev, travelersDetails: updated };
+    });
+  }, [formData.adults, formData.children, formData.infants]);
+
+  const handleTravelerDetailChange = (
+    idx: number,
+    field: 'name' | 'age',
+    value: string | number | ''
+  ) => {
+    setFormData(prev => {
+      const updated = [...prev.travelersDetails];
+      updated[idx] = {
+        ...updated[idx],
+        [field]: field === 'age' && value === '' ? '' : Number(value) || value
+      };
+      return { ...prev, travelersDetails: updated };
+    });
   };
 
-  return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">Create Custom Package</h2>
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-      {message && <p className="text-green-600 mb-4">{message}</p>}
+  const payload = {
+    name: formData.name,
+    destination: formData.destination,
+    startDate: formData.startDate,
+    endDate: formData.endDate,
+    accommodation: {
+      type: formData.accommodationType,
+      preferredRating: Number(formData.accommodationRating),
+      requirements: []
+    },
+    meals: {
+      included: formData.mealsIncluded,
+      preferences: formData.mealPreferences
+    },
+    activities: formData.activities,
+    budget: Number(formData.budget),
+    travelers: {
+      adults: Number(formData.adults),
+      children: Number(formData.children),
+      infants: Number(formData.infants),
+      details: formData.travelersDetails
+    },
+    specialRequests: formData.specialRequests
+  };
+
+  try {
+    await axios.post(`${BASE_URL}/custom-packages`, payload, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    setError('');
+    toast({
+      title: 'Success',
+      description: 'Custom package submitted successfully!',
+      duration: 4000
+    });
+
+    // Clear form
+    setFormData({
+      name: '',
+      destination: '',
+      startDate: '',
+      endDate: '',
+      accommodationType: '',
+      accommodationRating: '',
+      mealsIncluded: false,
+      mealPreferences: [],
+      activities: [],
+      budget: 1000,
+      adults: '',
+      children: '',
+      infants: '',
+      travelersDetails: [],
+      specialRequests: ''
+    });
+
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Error submitting package');
+  }
+};
+
+  return (
+    <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg relative">
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="absolute top-4 left-4 bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition"
+      >
+        Back
+      </button>
+
+      <h2 className="text-2xl font-bold mb-6 text-center">Create Custom Package</h2>
+
       {error && <p className="text-red-600 mb-4">{error}</p>}
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-        {/* Basic Info */}
         <label>
           Name
           <input
@@ -169,7 +224,6 @@ const CustomPackageForm = () => {
           />
         </label>
 
-        {/* Accommodation */}
         <label>
           Accommodation Type
           <select
@@ -199,54 +253,13 @@ const CustomPackageForm = () => {
           >
             <option value="">Rating</option>
             {[1, 2, 3, 4, 5].map(r => (
-              <option key={r} value={r}>{r}</option>
+              <option key={r} value={r}>
+                {r}
+              </option>
             ))}
           </select>
         </label>
 
-        {/* Transportation */}
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="transportationFlights"
-            checked={formData.transportationFlights}
-            onChange={handleChange}
-          />
-          Need Flights?
-        </label>
-
-        <label>
-          Flight Class
-          <select
-            name="transportationClass"
-            className="border p-2 rounded w-full"
-            value={formData.transportationClass}
-            onChange={handleChange}
-          >
-            <option value="">Flight Class</option>
-            <option value="economy">Economy</option>
-            <option value="premium_economy">Premium Economy</option>
-            <option value="business">Business</option>
-            <option value="first">First</option>
-          </select>
-        </label>
-
-        <label>
-          Local Transport
-          <select
-            name="transportationLocal"
-            className="border p-2 rounded w-full"
-            value={formData.transportationLocal}
-            onChange={handleChange}
-          >
-            <option value="">Local Transport</option>
-            <option value="public">Public</option>
-            <option value="private">Private</option>
-            <option value="rental">Rental</option>
-          </select>
-        </label>
-
-        {/* Meals */}
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -275,7 +288,6 @@ const CustomPackageForm = () => {
           </fieldset>
         )}
 
-        {/* Activities */}
         <fieldset className="mb-4 col-span-1 md:col-span-2">
           <legend className="font-semibold mb-2">Preferred Activities</legend>
           {activityOptions.map(option => (
@@ -292,7 +304,6 @@ const CustomPackageForm = () => {
           ))}
         </fieldset>
 
-        {/* Budget */}
         <label className="col-span-1 md:col-span-2">
           Budget (₹)
           <input
@@ -308,7 +319,6 @@ const CustomPackageForm = () => {
           <div className="text-sm text-gray-700 mt-1">Selected: ₹{formData.budget}</div>
         </label>
 
-        {/* Travelers */}
         <label>
           Adults
           <input
@@ -346,7 +356,46 @@ const CustomPackageForm = () => {
           />
         </label>
 
-        {/* Special Requests */}
+        {formData.travelersDetails.length > 0 && (
+          <fieldset className="col-span-1 md:col-span-2 border p-4 rounded">
+            <legend className="font-semibold mb-2">Traveler Details</legend>
+            {formData.travelersDetails.map((traveler, idx) => (
+              <div key={idx} className="grid grid-cols-2 gap-4 mb-4">
+                <label>
+                  Name #{idx + 1}
+                  <input
+                    type="text"
+                    className="border p-2 rounded w-full"
+                    value={traveler.name}
+                    onChange={e =>
+                      handleTravelerDetailChange(idx, 'name', e.target.value)
+                    }
+                    required
+                  />
+                </label>
+
+                <label>
+                  Age #{idx + 1}
+                  <input
+                    type="number"
+                    min={0}
+                    className="border p-2 rounded w-full"
+                    value={traveler.age}
+                    onChange={e =>
+                      handleTravelerDetailChange(
+                        idx,
+                        'age',
+                        e.target.value === '' ? '' : Number(e.target.value)
+                      )
+                    }
+                    required
+                  />
+                </label>
+              </div>
+            ))}
+          </fieldset>
+        )}
+
         <label className="col-span-1 md:col-span-2">
           Special Requests
           <textarea
