@@ -34,7 +34,13 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminCreatePackage from "./pages/AdminCreatePackage";
 import AdminPanel from "./pages/AdminPanel";
 import AdminPackageList from "./pages/AdminPackageList";
-import ManageUsers from "./pages/ManageUsers";
+import QRPopup from "./components/QRPopup";
+import ExplorePackages from "./pages/ExplorePackages";
+import PartnerDetails from "./Parnters/PartnerDetails";
+import FeaturedPackages from "./components/FeaturedPackages";
+import AllPackagesPage from "./pages/AllPackagesPage";
+import PageWishlist from "./pages/PageWishlist";
+//import ManageUsers from "./pages/ManageUsers";
 
 const queryClient = new QueryClient();
 
@@ -61,8 +67,8 @@ const App = () => (
            <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/change-password"element={<ChangePassword />} />
              <Route path="/payment-history"element={<PaymentHistory />} />
-          <Route path="/my-packages" element={<MyPackages />} />
-          <Route path="/wishlist" element={<WishlistPage />} />
+          {/* <Route path="/my-packages" element={<MyPackages />} /> */}
+          <Route path="/wishlist" element={<PageWishlist />} />
           <Route path="/destinations/:type" element={<Domestic />} />
           <Route
             path="/booking/:packageId"
@@ -71,7 +77,7 @@ const App = () => (
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/admin/dashboard" element={<AdminPanel />} />
-          <Route path="/admin/manage-users" element={<ManageUsers />} />
+          {/* <Route path="/admin/manage-users" element={<ManageUsers />} /> */}
           <Route path="/admin/package-list" element={<AdminPackageList />} />
           <Route
             path="/admin/create-package"

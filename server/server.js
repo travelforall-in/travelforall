@@ -58,6 +58,10 @@ app.use('/api/hotels', require('./routes/hotelRoutes'));
 app.use('/api/transportation', require('./routes/transportationRoutes'));
 app.use('/api/contact', require('./routes/contactRoutes'));
 
+//testimonial route
+app.use('/api/feedback', require('./routes/testimonialRoutes'));
+
+
 
 // Home route
 app.get('/', (req, res) => {
