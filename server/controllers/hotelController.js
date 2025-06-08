@@ -1,6 +1,5 @@
 // controllers/hotelController.js
-const Hotel = require('../models/Hotel');
-const { HotelReview } = require('../models/Hotel');
+const { Hotel, HotelReview } = require('../models/Hotel');
 const Location = require('../models/Location');
 const mongoose = require('mongoose');
 const fs = require('fs');
@@ -137,6 +136,9 @@ exports.getHotels = async (req, res) => {
     if (req.query.featured) {
       query.featured = req.query.featured === 'true';
     }
+
+    // Only show active hotels for public
+    query.status = 'active';
     
     // Sorting
     const sortOptions = {};
@@ -156,6 +158,7 @@ exports.getHotels = async (req, res) => {
     const total = await Hotel.countDocuments(query);
     const hotels = await Hotel.find(query)
       .populate('location', 'name country')
+      .populate('vendor', 'name vendorDetails.companyName')
       .sort(sortOptions)
       .skip(startIndex)
       .limit(limit);
@@ -199,11 +202,7 @@ exports.getHotel = async (req, res) => {
     
     const hotel = await Hotel.findById(req.params.id)
       .populate('location', 'name country region description images')
-      .populate({
-        path: 'reviews',
-        options: { sort: { createdAt: -1 }, limit: 10 },
-        populate: { path: 'user', select: 'name' }
-      });
+      .populate('vendor', 'name vendorDetails.companyName');
     
     if (!hotel) {
       return res.status(404).json({
@@ -456,6 +455,7 @@ exports.searchHotels = async (req, res) => {
     
     // Create query for keyword search
     const query = {
+      status: 'active',
       $or: [
         { name: { $regex: keyword, $options: 'i' } },
         { address: { $regex: keyword, $options: 'i' } },
@@ -490,7 +490,10 @@ exports.getFeaturedHotels = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 6;
     
-    const featuredHotels = await Hotel.find({ featured: true })
+    const featuredHotels = await Hotel.find({ 
+      featured: true,
+      status: 'active'
+    })
       .populate('location', 'name country')
       .sort('-rating')
       .limit(limit);

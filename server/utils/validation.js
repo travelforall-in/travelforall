@@ -570,4 +570,5 @@ exports.transportationReviewValidation = [
     .notEmpty()
     .withMessage('Comment is required')
     .trim()
+    
 ];

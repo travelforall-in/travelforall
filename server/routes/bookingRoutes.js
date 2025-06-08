@@ -1,4 +1,3 @@
-//bookingRouts
 const express = require('express');
 const router = express.Router();
 const {
@@ -11,10 +10,10 @@ const {
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { validate, bookingValidation } = require('../utils/validation');
 
-// User routes (protected)
+// Apply protect middleware to all routes
 router.use(protect);
 
-// Booking routes for users
+// Regular booking routes for users
 router.post('/', validate(bookingValidation), createBooking);
 router.get('/', getUserBookings);
 router.get('/:id', getBooking);
@@ -22,5 +21,8 @@ router.put('/:id/cancel', cancelBooking);
 
 // Admin route to get all bookings
 router.get('/admin/all', authorize('admin'), getAllBookings);
+router.get('/test', (req, res) => {
+  res.json({ message: 'Booking routes are working!' });
+});
 
 module.exports = router;

@@ -1,6 +1,6 @@
 // controllers/locationController.js
 const Location = require('../models/Location');
-const Hotel = require('../models/Hotel');
+const { Hotel } = require('../models/Hotel');
 const Transportation = require('../models/Transportation');
 const mongoose = require('mongoose');
 const fs = require('fs');
