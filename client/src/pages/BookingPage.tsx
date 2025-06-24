@@ -3,7 +3,18 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import BASE_URL from "@/utils/baseUrl";
 
-const BookingForm = ({ packageId, price }) => {
+interface Traveler {
+  name: string;
+  type: "adult" | "child" | "infant";
+}
+
+interface BookingFormProps {
+  packageId: string;
+  price: number;
+  packageTitle: string;
+}
+
+const BookingForm: React.FC<BookingFormProps> = ({ packageId, price, packageTitle }) => {
   const [travelDate, setTravelDate] = useState("");
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
@@ -12,7 +23,7 @@ const BookingForm = ({ packageId, price }) => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [specialRequests, setSpecialRequests] = useState("");
-  const [travelerDetails, setTravelerDetails] = useState([]);
+  const [travelerDetails, setTravelerDetails] = useState<Traveler[]>([]);
 
   const navigate = useNavigate();
 
@@ -20,7 +31,7 @@ const BookingForm = ({ packageId, price }) => {
   const totalPrice = (price || 0) * totalTravellers;
 
   useEffect(() => {
-    const updatedTravelers = [];
+    const updatedTravelers: Traveler[] = [];
 
     for (let i = 0; i < adults; i++) {
       updatedTravelers.push({ name: "", type: "adult" });
@@ -35,7 +46,7 @@ const BookingForm = ({ packageId, price }) => {
     setTravelerDetails(updatedTravelers);
   }, [adults, children, infants]);
 
-  const handleBooking = async () => {
+  const handleBooking = () => {
     if (!travelDate || adults < 1 || !phone || !name || !email) {
       alert("Please fill in all required fields. At least one adult and contact info is required.");
       return;
@@ -61,22 +72,11 @@ const BookingForm = ({ packageId, price }) => {
         phone,
       },
       specialRequests,
+      amount: totalPrice,
+      packageTitle,
     };
 
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(`${BASE_URL}/bookings`, bookingData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      alert("Booking successful!");
-      navigate("/my-bookings");
-    } catch (error) {
-      console.error("Booking error:", error);
-      alert("Booking failed: " + (error.response?.data?.message || "Server error"));
-    }
+    navigate("/payment", { state: { bookingData } });
   };
 
   return (
